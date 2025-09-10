@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -20,7 +20,7 @@ use yii\base\InvalidConfigException;
  * which can be stand-alone within a separate <div> or bound to a Map.
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- * 
+ *
  * @link http://www.2amigos.us/
  * @package dosamigos\google\maps
  */

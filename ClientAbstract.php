@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -60,7 +60,7 @@ abstract class ClientAbstract extends BaseObject
 
         /** BACKWARD COMPATIBILITY */
         if (!isset($this->params['key']) || !$this->params['key']) {
-            $this->params['key'] = @Yii::$app->params['googleMapsApiKey'] ? : null;
+            $this->params['key'] = @Yii::$app->params['googleMapsApiKey'] ?: null;
         }
 
         if (!$this->params['key']) {

@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -11,7 +11,7 @@
 namespace dosamigos\google\maps;
 
 use yii\base\BaseObject;
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\helpers\Json;
@@ -23,7 +23,7 @@ use yii\web\JsExpression;
  * ObjectAbstract class where most objects extend from
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- * 
+ *
  * @link http://www.2amigos.us/
  * @package dosamigos\google\maps
  */
@@ -127,8 +127,8 @@ abstract class ObjectAbstract extends BaseObject
         if ($autoGenerate) {
             $reflection = new \ReflectionClass($this);
             $this->_name = self::$autoNamePrefix . Inflector::variablize(
-                    $reflection->getShortName()
-                ) . self::$counter++;
+                $reflection->getShortName()
+            ) . self::$counter++;
         }
         return $this->_name;
     }
@@ -207,7 +207,7 @@ abstract class ObjectAbstract extends BaseObject
         try {
             // a value may contain a valid JSON string
             return Json::decode($value);
-        } catch (InvalidParamException $e) {
+        } catch (InvalidArgumentException $e) {
         }
         return $value;
     }

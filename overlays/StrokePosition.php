@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -16,15 +16,15 @@ namespace dosamigos\google\maps\overlays;
  * Specifies the possible positions of the stroke on a polygon.
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- * 
+ *
  * @link http://www.2amigos.us/
  * @package dosamigos\google\maps\overlays
  */
 class StrokePosition
 {
-    const CENTER = 'google.maps.StrokePosition.CENTER';
-    const INSIDE = 'google.maps.StrokePosition.INSIDE';
-    const OUTSIDE = 'google.maps.StrokePosition.OUTSIDE';
+    public const CENTER = 'google.maps.StrokePosition.CENTER';
+    public const INSIDE = 'google.maps.StrokePosition.INSIDE';
+    public const OUTSIDE = 'google.maps.StrokePosition.OUTSIDE';
 
     /**
      * Checks whether the value is a valid [StrokePosition] constant.

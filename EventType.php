@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -22,10 +22,10 @@ namespace dosamigos\google\maps;
  */
 class EventType
 {
-    const DEFAULT_EVENT = 'DEFAULT';
-    const DEFAULT_ONCE = 'DEFAULT_ONCE';
-    const DOM = 'DOM';
-    const DOM_ONCE = 'DOM_ONCE';
+    public const DEFAULT_EVENT = 'DEFAULT';
+    public const DEFAULT_ONCE = 'DEFAULT_ONCE';
+    public const DOM = 'DOM';
+    public const DOM_ONCE = 'DOM_ONCE';
 
     /**
      * Checks whether value is a valid [EventType] constant.
@@ -43,7 +43,8 @@ class EventType
                 static::DEFAULT_ONCE,
                 static::DOM,
                 static::DOM_ONCE
-            ]
+            ],
+            true
         );
     }
 }

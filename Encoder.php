@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -161,9 +161,9 @@ class Encoder
             $out = sqrt(pow($p2[0] - $p0[0], 2) + pow($p2[1] - $p0[1], 2));
         } else {
             $u = (($p0[0] - $p1[0]) * ($p2[0] - $p1[0]) + ($p0[1] - $p1[1]) * ($p2[1] - $p1[1])) / (pow(
-                        $p2[0] - $p1[0],
-                        2
-                    ) + pow($p2[1] - $p1[1], 2));
+                $p2[0] - $p1[0],
+                2
+            ) + pow($p2[1] - $p1[1], 2));
             if ($u <= 0) {
                 $out = sqrt(pow($p0[0] - $p1[0], 2) + pow($p0[1] - $p1[1], 2));
             }

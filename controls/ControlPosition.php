@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -30,18 +30,18 @@ namespace dosamigos\google\maps\controls;
  */
 class ControlPosition
 {
-    const TOP_CENTER = 'google.maps.ControlPosition.TOP_CENTER';
-    const TOP_LEFT = 'google.maps.ControlPosition.TOP_LEFT';
-    const TOP_RIGHT = 'google.maps.ControlPosition.TOP_RIGHT';
-    const LEFT_TOP = 'google.maps.ControlPosition.LEFT_TOP';
-    const RIGHT_TOP = 'google.maps.ControlPosition.RIGHT_TOP';
-    const LEFT_CENTER = 'google.maps.ControlPosition.LEFT_CENTER';
-    const RIGHT_CENTER = 'google.maps.ControlPosition.RIGHT_CENTER';
-    const LEFT_BOTTOM = 'google.maps.ControlPosition.LEFT_BOTTOM';
-    const RIGHT_BOTTOM = 'google.maps.ControlPosition.RIGHT_BOTTOM';
-    const BOTTOM_LEFT = 'google.maps.ControlPosition.BOTTOM_LEFT';
-    const BOTTOM_CENTER = 'google.maps.ControlPosition.BOTTOM_CENTER';
-    const BOTTOM_RIGHT = 'google.maps.ControlPosition.BOTTOM_RIGHT';
+    public const TOP_CENTER = 'google.maps.ControlPosition.TOP_CENTER';
+    public const TOP_LEFT = 'google.maps.ControlPosition.TOP_LEFT';
+    public const TOP_RIGHT = 'google.maps.ControlPosition.TOP_RIGHT';
+    public const LEFT_TOP = 'google.maps.ControlPosition.LEFT_TOP';
+    public const RIGHT_TOP = 'google.maps.ControlPosition.RIGHT_TOP';
+    public const LEFT_CENTER = 'google.maps.ControlPosition.LEFT_CENTER';
+    public const RIGHT_CENTER = 'google.maps.ControlPosition.RIGHT_CENTER';
+    public const LEFT_BOTTOM = 'google.maps.ControlPosition.LEFT_BOTTOM';
+    public const RIGHT_BOTTOM = 'google.maps.ControlPosition.RIGHT_BOTTOM';
+    public const BOTTOM_LEFT = 'google.maps.ControlPosition.BOTTOM_LEFT';
+    public const BOTTOM_CENTER = 'google.maps.ControlPosition.BOTTOM_CENTER';
+    public const BOTTOM_RIGHT = 'google.maps.ControlPosition.BOTTOM_RIGHT';
 
     /**
      * Checks whether the value is a valid [ControlPosition] constant.

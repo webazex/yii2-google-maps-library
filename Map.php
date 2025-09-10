@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -82,7 +82,7 @@ use yii\web\View;
  * @property [\doamigos\maps\controls\ZoomControlOptions] $zoomControlOptions The display options for the Zoom control.
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- * 
+ *
  * @link http://www.2amigos.us/
  * @package dosamigos\google\maps
  */
@@ -306,7 +306,7 @@ class Map extends ObjectAbstract
         $params = [
             'maptype' => $maptype,
             'zoom' => $this->zoom,
-            'key' => @Yii::$app->params['googleMapsApiKey'] ? : null,
+            'key' => @Yii::$app->params['googleMapsApiKey'] ?: null,
             'center' => $this->center,
             'size' => $this->width . 'x' . $this->height,
             'hl' => $hl,

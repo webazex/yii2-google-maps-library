@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -26,7 +26,7 @@ namespace dosamigos\google\maps\controls;
  */
 class ScaleControlStyle
 {
-    const DEFAULT_STYLE = 'google.maps.ScaleControlStyle.DEFAULT';
+    public const DEFAULT_STYLE = 'google.maps.ScaleControlStyle.DEFAULT';
 
     /**
      * Checks whether value is a valid [ScaleControlStyle] constant.
@@ -41,7 +41,8 @@ class ScaleControlStyle
             $value,
             [
                 static::DEFAULT_STYLE,
-            ]
+            ],
+            true
         );
     }
 }

@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -11,8 +11,8 @@
 namespace dosamigos\google\maps;
 
 use yii\base\BaseObject;
+use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
-use yii\base\InvalidParamException;
 
 /**
  * Event
@@ -20,7 +20,7 @@ use yii\base\InvalidParamException;
  * Google maps event
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- * 
+ *
  * @link http://www.2amigos.us/
  * @package dosamigos\google\maps
  */
@@ -62,12 +62,12 @@ class Event extends BaseObject
      *
      * @param string $value
      *
-     * @throws \yii\base\InvalidParamException
+     * @throws \yii\base\InvalidArgumentException
      */
     public function setType($value)
     {
         if (!EventType::getIsValid($value)) {
-            throw new InvalidParamException('Unrecognized event type');
+            throw new InvalidArgumentException('Unrecognized event type');
         }
         $this->_type = $value;
     }

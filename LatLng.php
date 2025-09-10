@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -10,8 +10,8 @@
 
 namespace dosamigos\google\maps;
 
-use yii\base\InvalidParamException;
-
+use yii\base\InvalidArgumentException;
+use dosamigos\google\maps\overlays\Polygon;
 /**
  * LatLng
  *
@@ -124,8 +124,8 @@ class LatLng extends ObjectAbstract
 
         $theta = $lon1 - $lon2;
         $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(
-                deg2rad($theta)
-            );
+            deg2rad($theta)
+        );
         $dist = acos($dist);
         $dist = rad2deg($dist);
         $miles = $dist * 60 * 1.1515;
@@ -317,7 +317,7 @@ class LatLng extends ObjectAbstract
      *
      * @param LatLng[] $coords
      *
-     * @throws \yii\base\InvalidParamException
+     * @throws \yii\base\InvalidArgumentException
      * @return LatLng|null
      */
     public static function getCenterOfCoordinates($coords)
@@ -331,7 +331,7 @@ class LatLng extends ObjectAbstract
 
         foreach ($coords as $coord) {
             if (!($coord instanceof LatLng)) {
-                throw new InvalidParamException('$coord must be an array of "' . self::className() . '" objects');
+                throw new InvalidArgumentException('$coord must be an array of "' . self::className() . '" objects');
             }
             $centerLat += $coord->getLat();
             $centerLng += $coord->getLng();

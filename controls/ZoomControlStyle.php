@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -26,9 +26,9 @@ namespace dosamigos\google\maps\controls;
  */
 class ZoomControlStyle
 {
-    const DEFAULT_STYLE = 'google.maps.ZoomControlStyle.DEFAULT';
-    const LARGE = 'google.maps.ZoomControlStyle.LARGE';
-    const SMALL = 'google.maps.ZoomControlStyle.SMALL';
+    public const DEFAULT_STYLE = 'google.maps.ZoomControlStyle.DEFAULT';
+    public const LARGE = 'google.maps.ZoomControlStyle.LARGE';
+    public const SMALL = 'google.maps.ZoomControlStyle.SMALL';
 
     /**
      * @param $value
