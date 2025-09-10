@@ -28,7 +28,8 @@
         "ext-json": "*",
         "yiisoft/yii2": ">=2.0.13",
         "guzzlehttp/guzzle": "6.*",
-        "ext-SimpleXML": "^7.2"
+        "ext-SimpleXML": "*",
+        "php": "^7.2 || ^8.0 || ^8.2",
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.10@dev",
