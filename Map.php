@@ -8,16 +8,9 @@
 
 namespace dosamigos\google\maps;
 
-use dosamigos\google\maps\controls\MapTypeControlOptions;
-use extensions\google\controls\maps\OverviewMapControlOptions;
-use dosamigos\google\maps\controls\PanControlOptions;
-use dosamigos\google\maps\controls\ScaleControlOptions;
-use dosamigos\google\maps\controls\StreetViewControlOptions;
-use dosamigos\google\maps\controls\ZoomControlOptions;
 use dosamigos\google\maps\services\StreetViewPanorama;
 use dosamigos\google\maps\ObjectAbstract;
 use yii\base\Component;
-use yii\base\Yii;
 
 /**
  * Map
@@ -53,39 +46,9 @@ class Map extends Component
     public $zoom = 8;
 
     /**
-     * @var \dosamigos\google\maps\controls\MapTypeControlOptions|null The initial display options for the Map type control.
-     */
-    public $mapTypeControlOptions;
-
-    /**
-     * @var \dosamigos\google\maps\controls\OverviewMapControlOptions|null The display options for the Overview Map control.
-     */
-    public $overviewMapControlOptions;
-
-    /**
-     * @var \dosamigos\google\maps\controls\PanControlOptions|null The display options for the Pan control.
-     */
-    public $panControlOptions;
-
-    /**
-     * @var \dosamigos\google\maps\controls\ScaleControlOptions|null The initial display options for the Scale control.
-     */
-    public $scaleControlOptions;
-
-    /**
      * @var \dosamigos\google\maps\services\StreetViewPanorama|null A StreetViewPanorama to display when the Street View pegman is dropped on the map.
      */
     public $streetView;
-
-    /**
-     * @var \dosamigos\google\maps\controls\StreetViewControlOptions|null The initial display options for the Street View Pegman control.
-     */
-    public $streetViewControlOptions;
-
-    /**
-     * @var \dosamigos\google\maps\controls\ZoomControlOptions|null The display options for the Zoom control.
-     */
-    public $zoomControlOptions;
 
     /**
      * @var array<string, string> the HTML attributes for the map container
@@ -109,6 +72,7 @@ class Map extends Component
 
     /**
      * @throws \yii\base\InvalidConfigException
+     * @return void
      */
     public function init()
     {
@@ -139,7 +103,7 @@ class Map extends Component
 
         foreach ($this->overlays as $overlay) {
             if ($overlay instanceof ObjectAbstract) {
-                $js .= $overlay->getJs($this->containerId);
+                $js .= $overlay->getJs();
             }
         }
 
@@ -158,29 +122,11 @@ class Map extends Component
             'mapTypeId' => "google.maps.MapTypeId." . strtoupper($this->mapType),
         ];
 
-        if ($this->mapTypeControlOptions !== null) {
-            $options['mapTypeControlOptions'] = $this->mapTypeControlOptions->getOptions();
-        }
-        if ($this->overviewMapControlOptions !== null) {
-            $options['overviewMapControlOptions'] = $this->overviewMapControlOptions->getOptions();
-        }
-        if ($this->panControlOptions !== null) {
-            $options['panControlOptions'] = $this->panControlOptions->getOptions();
-        }
-        if ($this->scaleControlOptions !== null) {
-            $options['scaleControlOptions'] = $this->scaleControlOptions->getOptions();
-        }
         if ($this->streetView !== null) {
             $options['streetView'] = $this->streetView;
         }
-        if ($this->streetViewControlOptions !== null) {
-            $options['streetViewControlOptions'] = $this->streetViewControlOptions->getOptions();
-        }
-        if ($this->zoomControlOptions !== null) {
-            $options['zoomControlOptions'] = $this->zoomControlOptions->getOptions();
-        }
 
-        return Json::encode($options);
+        return json_encode($options);
     }
 
     /**

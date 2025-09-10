@@ -1,144 +1,74 @@
 <?php
-
 /*
- *
  * @copyright Copyright (c) 2013-2019 2amigos
+ * @copyright Copyright (c) 2025 Latul Anton (webazex@gmail.com, https://latul.website)
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- *
  */
 
 namespace dosamigos\google\maps;
 
-use yii\base\BaseObject;
-use yii\base\InvalidArgumentException;
+use yii\base\Component;
 use yii\base\InvalidConfigException;
 
 /**
  * Event
  *
- * Google maps event
+ * Represents a Google Maps event
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- *
+ * @author Latul Anton <webazex@gmail.com>
  * @link http://www.2amigos.us/
+ * @link https://latul.website/
  * @package dosamigos\google\maps
  */
-class Event extends BaseObject
+class Event extends Component
 {
     /**
-     * @var string the action that will trigger the event
+     * @var string the name of the event
      */
-    public $trigger;
-    /**
-     * @var string the javascript code to be executed
-     */
-    public $js;
-    /**
-     * @var bool whether to wrap the js code within a javascript function (ie `"function(){ $js }"`)
-     */
-    public $wrap = true;
-    /**
-     * @var string the type of event. Defaults to [[EventType::DEFAULT_EVENT]]
-     */
-    private $_type = EventType::DEFAULT_EVENT;
+    public $name;
 
     /**
-     * @inheritdoc
+     * @var string the JavaScript event handler
+     */
+    public $handler;
+
+    /**
+     * @var string the type of the event
+     */
+    public $type;
+
+    /**
+     * @throws \yii\base\InvalidConfigException
+     * @return void
      */
     public function init()
     {
-        if (empty($this->trigger)) {
-            throw new InvalidConfigException('"$trigger" cannot be null.');
-        }
-        if (empty($this->js)) {
-            throw new InvalidConfigException('"js" cannot be null.');
-        }
         parent::init();
-    }
-
-    /**
-     * Sets the type of event, by default Google Event
-     *
-     * @param string $value
-     *
-     * @throws \yii\base\InvalidArgumentException
-     */
-    public function setType($value)
-    {
-        if (!EventType::getIsValid($value)) {
-            throw new InvalidArgumentException('Unrecognized event type');
+        if ($this->name === null || $this->handler === null) {
+            throw new InvalidConfigException('"name" and "handler" cannot be null');
         }
-        $this->_type = $value;
     }
 
     /**
-     * Returns type of event
+     * Sets the type of the event
+     * @param string $type
+     * @return void
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Returns the JavaScript code for the event
+     * @param string $map
      * @return string
      */
-    public function getType()
+    public function getJs($map)
     {
-        return $this->_type;
-    }
-
-    /**
-     * Returns the js function to be executed
-     * @return string
-     */
-    public function getFunction()
-    {
-        return $this->wrap
-            ? "function(event){{$this->js}}"
-            : $this->js;
-    }
-
-    /**
-     * Returns the javascript code for attaching a Google event to a javascript object
-     *
-     * @param string $name the javascript object name to attach the event to
-     * @param bool $once whether to make a one time call event or not
-     *
-     * @return string
-     */
-    public function getEventJs($name, $once = false)
-    {
-        $once = ($once) ? 'Once' : '';
-        return "google.maps.event.addListener$once($name, '{$this->trigger}', {$this->getFunction()});";
-    }
-
-    /**
-     * Returns the javascript code for attaching a dom event to a javascript object
-     *
-     * @param string $name
-     * @param bool $once
-     *
-     * @return string
-     */
-    public function getDomEventJs($name, $once = false)
-    {
-        $once = ($once) ? 'Once' : '';
-        return "google.maps.event.addDomListener$once($name, '{$this->trigger}', {$this->getFunction()});";
-    }
-
-    /**
-     * Returns the js code to attach a Google event or a Dom event to a js object
-     *
-     * @param string $name the object name
-     *
-     * @return string the js event
-     */
-    public function getJs($name)
-    {
-        switch ($this->getType()) {
-            case EventType::DEFAULT_ONCE:
-                return $this->getEventJs($name, true);
-            case EventType::DOM:
-                return $this->getDomEventJs($name);
-            case EventType::DOM_ONCE:
-                return $this->getDomEventJs($name, true);
-            case EventType::DEFAULT_EVENT:
-            default:
-                return $this->getEventJs($name);
-        }
+        $type = $this->type ?: 'google.maps.event';
+        return "{$type}.addListener({$map}, '{$this->name}', {$this->handler});";
     }
 }

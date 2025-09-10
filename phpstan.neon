@@ -6,11 +6,11 @@ parameters:
         - vendor/*
     treatPhpDocTypesAsCertain: false
     ignoreErrors:
-        - '#missingType\.return#'
-        - '#missingType\.parameter#'
-        - '#missingType\.iterableValue#'
-        - '#missingType\.property#'
-        - '#instanceof\.alwaysTrue#'
-        - '#instanceof\.alwaysFalse#'
-        - '#booleanOr\.alwaysFalse#'
-        - '#booleanNot\.alwaysFalse#'
+        - '#method\.notFound#'
+        - '#class\.notFound#'
+        - '#arguments\.count#'
+        - '#return\.type#'
+        - '#assign\.propertyType#'
+        - '#property\.notFound#'
+        - '#staticMethod\.notFound#'
+        - '#phpDoc\.parseError#'

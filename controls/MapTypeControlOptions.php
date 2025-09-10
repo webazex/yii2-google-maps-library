@@ -1,115 +1,78 @@
 <?php
-
 /*
- *
  * @copyright Copyright (c) 2013-2019 2amigos
+ * @copyright Copyright (c) 2025 Latul Anton (webazex@gmail.com, https://latul.website)
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- *
  */
 
 namespace dosamigos\google\maps\controls;
 
-use dosamigos\google\maps\MapTypeId;
 use dosamigos\google\maps\ObjectAbstract;
-use dosamigos\google\maps\OptionsTrait;
-use yii\base\InvalidConfigException;
-use yii\helpers\ArrayHelper;
-use yii\web\JsExpression;
 
 /**
  * MapTypeControlOptions
  *
- * Options for the rendering of the map type control.
- *
- * For further information please visit its
- * [documentation](https://developers.google.com/maps/documentation/javascript/reference#MapTypeControlOptions) at Google.
- *
- * ```
- * use dosamigos\google\maps\controls\MapTypeControlOptions;
- * use dosamigos\google\maps\controls\MapTypeControlStyle;
- * use dosamigos\google\maps\Map;
- *
- * $options = new MapTypeControlOptions(['style' => MapTypeControlStyle::DROPDOWN_MENU]);
- *
- * $map = new Map(['mayTypeControlOptions' => $options]);
- *
- * ```
- *
- * @property array mapTypeIds IDs of map types to show in the control.
- * @property string position Position id by [ControlPosition]. Used to specify the position of the control on the map.
- * The default position is [ControlPosition::TOP_RIGHT].
- * @property string style. Used to select what style of map type control to display. Use [MapTypeControlStyle] for it.
+ * Object to configure map type control options
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- *
+ * @author Latul Anton <webazex@gmail.com>
  * @link http://www.2amigos.us/
+ * @link https://latul.website/
  * @package dosamigos\google\maps\controls
  */
 class MapTypeControlOptions extends ObjectAbstract
 {
-    use OptionsTrait;
+    /**
+     * @var array<string> IDs of map types to show in the control
+     */
+    public $mapTypeIds = [];
 
     /**
-     * @inheritdoc
+     * @var string Position id. Used to specify the position of the control on the map
+     */
+    public $position = ControlPosition::TOP_RIGHT;
+
+    /**
+     * @var string Style id. Used to select what style of map type control to display
+     */
+    public $style;
+
+    /**
+     * @return void
      */
     public function init()
     {
-        $this->options = ArrayHelper::merge(
-            [
-                'mapTypeIds' => [],
-                'position' => ControlPosition::TOP_RIGHT,
-                'style' => null
-            ],
-            $this->options
-        );
+        parent::init();
     }
 
     /**
-     * Sets the map type ids and makes sure to get the proper value on the array
-     *
-     * @param array $types
+     * Sets the map type IDs
+     * @param array<string> $types
+     * @return void
      */
     public function setMapTypeIds(array $types)
     {
-        $parsed = [];
-        foreach ($types as $type) {
-            $parsed[] = MapTypeId::getIsValid($type)
-                ? new JsExpression($type)
-                : $type;
-        }
-
-        $this->options['mapTypeIds'] = $parsed;
+        $this->mapTypeIds = $types;
     }
 
     /**
-     * Sets the position and makes sure is a valid [ControlPosition] value.
-     *
+     * Sets the position
      * @param string $value
-     *
-     * @throws \yii\base\InvalidConfigException
+     * @return void
      */
     public function setPosition($value)
     {
-        if (!ControlPosition::getIsValid($value)) {
-            throw new InvalidConfigException('Unknown "position" value');
-        }
-        $this->options['position'] = $value;
+        $this->position = $value;
     }
 
     /**
-     * Sets the style and makes sure is a valid [MapTypeControlStyle] value.
-     *
+     * Sets the style
      * @param string $value
-     *
-     * @throws \yii\base\InvalidConfigException
+     * @return void
      */
     public function setStyle($value)
     {
-        if (!MapTypeControlStyle::getIsValid($value)) {
-            throw new InvalidConfigException('Unknown "style" value');
-        }
-
-        $this->options['style'] = $value;
+        $this->style = $value;
     }
 }
