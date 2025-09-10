@@ -26,10 +26,10 @@
     ],
     "require": {
         "ext-json": "*",
-        "yiisoft/yii2": ">=2.0.13",
-        "guzzlehttp/guzzle": "6.*",
+        "yiisoft/yii2": "^2.0.53",
+        "guzzlehttp/guzzle": "^7.0",
         "ext-SimpleXML": "*",
-        "php": "^7.2 || ^8.0 || ^8.2",
+        "php": "^8.2"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.10@dev",
@@ -41,6 +41,9 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
     }
 }
