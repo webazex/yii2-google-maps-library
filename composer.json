@@ -22,6 +22,11 @@
             "name": "Antonio Ramirez",
             "email": "hola@2amigos.us",
             "homepage": "https://2amigos.us"
+        },
+        {
+            "name": "Anton Latul",
+            "email": "webazex@gmail.com",
+            "homepage": "https://latul.website"
         }
     ],
     "require": {
@@ -32,8 +37,10 @@
         "php": "^8.2"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.10@dev",
-        "roave/security-advisories": "dev-master"
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "roave/security-advisories": "dev-master",
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^1.10"
     },
     "autoload": {
         "psr-4": {
