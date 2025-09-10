@@ -22,16 +22,24 @@
             "name": "Antonio Ramirez",
             "email": "hola@2amigos.us",
             "homepage": "https://2amigos.us"
+        },
+        {
+            "name": "Anton Latul",
+            "email": "webazex@gmail.com",
+            "homepage": "https://latul.website"
         }
     ],
     "require": {
+        "php": "^8.2",
+        "ext-SimpleXML": "*",
         "ext-json": "*",
-        "yiisoft/yii2": ">=2.0.13",
-        "guzzlehttp/guzzle": "6.*",
-        "ext-SimpleXML": "^7.2"
+        "guzzlehttp/guzzle": "^7.8",
+        "yiisoft/yii2": "22.0.x-dev"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.10@dev",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^9.5",
         "roave/security-advisories": "dev-master"
     },
     "autoload": {
@@ -40,6 +48,13 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
+    },
+    "scripts": {
+        "cs-fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+        "cs-check": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --verbose"
     }
 }
