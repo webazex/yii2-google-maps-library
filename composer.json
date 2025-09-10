@@ -30,11 +30,11 @@
         }
     ],
     "require": {
-        "ext-json": "*",
-        "yiisoft/yii2": "^2.0.53",
-        "guzzlehttp/guzzle": "^7.0",
+        "php": "^8.2",
         "ext-SimpleXML": "*",
-        "php": "^8.2"
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.8",
+        "yiisoft/yii2": "22.0.x-dev"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
@@ -52,5 +52,9 @@
         "allow-plugins": {
             "yiisoft/yii2-composer": true
         }
+    },
+    "scripts": {
+        "cs-fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+        "cs-check": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --verbose"
     }
 }

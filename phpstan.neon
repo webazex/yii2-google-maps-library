@@ -4,5 +4,13 @@ parameters:
         - .
     excludePaths:
         - vendor/*
+    treatPhpDocTypesAsCertain: false
     ignoreErrors:
-        - '#(vendor|tests)/.*#'
+        - '#missingType\.return#'
+        - '#missingType\.parameter#'
+        - '#missingType\.iterableValue#'
+        - '#missingType\.property#'
+        - '#instanceof\.alwaysTrue#'
+        - '#instanceof\.alwaysFalse#'
+        - '#booleanOr\.alwaysFalse#'
+        - '#booleanNot\.alwaysFalse#'

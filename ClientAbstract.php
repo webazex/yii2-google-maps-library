@@ -1,103 +1,96 @@
 <?php
-
 /*
- *
  * @copyright Copyright (c) 2013-2019 2amigos
+ * @copyright Copyright (c) 2025 Latul Anton (webazex@gmail.com, https://latul.website)
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- *
  */
 
 namespace dosamigos\google\maps;
 
-use Exception;
-use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Yii;
-use yii\base\BaseObject;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
+use yii\base\Yii;
 
 /**
  * ClientAbstract
  *
- * Base class for those objects that make requests to the Google Web Services API
+ * Base class for DirectionsClient and GeocodingClient
  *
  * @author Antonio Ramirez <hola@2amigos.us>
+ * @author Latul Anton <webazex@gmail.com>
  *
  * @link http://www.2amigos.us/
+ * @link https://latul.website/
  * @package dosamigos\google\maps
  */
-abstract class ClientAbstract extends BaseObject
+abstract class ClientAbstract extends Component
 {
     /**
-     * @var string response format. Can be json or xml.
+     * @var string the key to authenticate Google Maps API requests
+     */
+    public $key;
+
+    /**
+     * @var string the format the response should be formatted
      */
     public $format = 'json';
+
     /**
-     * @var array the request parameters
+     * @var array<string, mixed> additional parameters to add to the request
      */
     public $params = [];
+
     /**
-     * @var \Guzzle\Http\Client a client to make requests to the Google API
+     * @var \GuzzleHttp\Client
      */
     private $_guzzle;
 
     /**
-     * Returns the api url
-     * @return string
-     */
-    abstract public function getUrl();
-
-    /**
-     * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function init()
     {
-        /** @var MapAsset|null $mapBundle */
-        $mapBundle = @Yii::$app->getAssetManager()->getBundle(MapAsset::className());
-        if ($mapBundle) {
-            $this->params = array_merge($this->params, $mapBundle->options);
+        if ($this->key === null) {
+            throw new InvalidConfigException('"key" cannot be null');
         }
-
-        /** BACKWARD COMPATIBILITY */
-        if (!isset($this->params['key']) || !$this->params['key']) {
-            $this->params['key'] = @Yii::$app->params['googleMapsApiKey'] ?: null;
+        if (!in_array($this->format, ['json', 'xml'])) {
+            throw new InvalidConfigException('"format" must be either "json" or "xml"');
         }
-
-        if (!$this->params['key']) {
-            throw new Exception("Invalid configuration - missing Google API key! Configure MapAsset bundle in assetManager");
-        }
+        $this->params['key'] = $this->key;
     }
 
     /**
-     * Makes the request to the Google API
+     * Makes a request to Google Maps API
      *
-     * @param array $options for the guzzle request
+     * @param string $path
+     * @param array<string, mixed> $options
      *
-     * @return mixed|null
+     * @return mixed
+     * @throws \Exception
      */
-    protected function request($options = [])
+    public function request($path, $options = [])
     {
+        $options = array_merge($this->params, $options);
         try {
-            $params = array_filter($this->params);
-            $response = $this->getClient()
-                ->get($this->getUrl(), ['query' => $params], $options);
+            $response = $this->getClient()->get($path, ['query' => $options]);
+            $content = $response->getBody()->getContents();
 
-            return trim($this->format) === 'json'
-                ? json_decode($response->getBody(), true)
-                : simplexml_load_string($response->getBody());
+            return $this->format == 'json' ? json_decode($content) : $content;
         } catch (RequestException $e) {
-            return null;
+            throw new \Exception($e->getMessage());
         }
     }
 
     /**
-     * Returns the guzzle client
-     * @return \Guzzle\Http\Client|HttpClient
+     * @return \GuzzleHttp\Client
      */
-    protected function getClient()
+    public function getClient()
     {
         if ($this->_guzzle === null) {
-            $this->_guzzle = new HttpClient();
+            $this->_guzzle = new Client(['base_uri' => 'https://maps.googleapis.com/maps/api/']);
         }
         return $this->_guzzle;
     }
