@@ -1,11 +1,9 @@
 <?php
-
 /*
- *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
+ * @copyright Copyright (c) 2025 Latul Anton (webazex@gmail.com, https://latul.website)
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- *
  */
 
 namespace dosamigos\google\maps;
@@ -16,62 +14,41 @@ use yii\web\AssetBundle;
 /**
  * MapAsset
  *
- * Registers the google maps api
- *
- * To update the key or other options like language, version, or library
- * use the Asset Bundle customization.
- * http://www.yiiframework.com/doc-2.0/guide-structure-assets.html#customizing-asset-bundles
- * To get key, please visit https://code.google.com/apis/console/
- *
- *      'components' => [
- *          'assetManager' => [
- *              'bundles' => [
- *                  'dosamigos\google\maps\MapAsset' => [
- *                      'options' => [
- *                          'key' => 'this_is_my_key',
- *                          'language' => 'id',
- *                          'version' => '3.1.18'
- *                      ]
- *                  ]
- *              ]
- *          ],
- *      ],
+ * Registers the Google Maps Javascript API
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- *
+ * @author Latul Anton <webazex@gmail.com>
  * @link http://www.2amigos.us/
+ * @link https://latul.website/
  * @package dosamigos\google\maps
  */
 class MapAsset extends AssetBundle
 {
     /**
-     * Sets options for the google map
-     * @var array
+     * @var string the source path
+     */
+    public $sourcePath = '@vendor/2amigos/yii2-google-maps-library/assets';
+
+    /**
+     * @var array<string, mixed> the bundle options
      */
     public $options = [];
 
     /**
-     * @inheritdoc
+     * @return void
      */
     public function init()
     {
-        // BACKWARD COMPATIBILITY
-        // To configure please, add `googleMapsApiKey` parameter to your application configuration
-        // file with the value of your API key. To get yours, please visit https://code.google.com/apis/console/.
-        $key = @Yii::$app->params['googleMapsApiKey'];
-        // To configure please, add `googleMapsLibraries` parameter to your application configuration.
-        // For example "geometry,places"
-        $libraries = @Yii::$app->params['googleMapsLibraries'];
-        // To configure please, add `googleMapsLanguage` parameter to your application configuration
-        $language = @Yii::$app->params['googleMapsLanguage'];
-
-        $this->options = array_merge($this->options, array_filter([
-            'key' => $key,
-            'libraries' => $libraries,
-            'language' => $language,
-        ]));
-        // BACKWARD COMPATIBILITY
-
-        $this->js[] = '//maps.googleapis.com/maps/api/js?' . http_build_query($this->options);
+        parent::init();
+        $key = isset($this->options['key']) ? $this->options['key'] : '';
+        $this->js = [
+            'https://maps.googleapis.com/maps/api/js?key=' . $key
+        ];
+        if (isset(Yii::$app->params['googleMapsLanguage'])) {
+            $this->js[0] .= '&language=' . Yii::$app->params['googleMapsLanguage'];
+        }
+        if (isset(Yii::$app->params['googleMapsLibraries'])) {
+            $this->js[0] .= '&libraries=' . implode(',', Yii::$app->params['googleMapsLibraries']);
+        }
     }
 }

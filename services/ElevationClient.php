@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -12,7 +12,6 @@ namespace dosamigos\google\maps\services;
 
 use dosamigos\google\maps\ClientAbstract;
 use dosamigos\google\maps\Encoder;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -22,7 +21,7 @@ use yii\helpers\ArrayHelper;
  * https://developers.google.com/maps/documentation/elevation/
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- * 
+ *
  * @link http://www.2amigos.us/
  * @package dosamigos\google\maps
  */

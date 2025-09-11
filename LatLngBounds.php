@@ -1,423 +1,143 @@
 <?php
-
 /*
- *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
+ * @copyright Copyright (c) 2025 Latul Anton (webazex@gmail.com, https://latul.website)
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- *
  */
 
 namespace dosamigos\google\maps;
 
-use dosamigos\google\maps\overlays\Marker;
-use dosamigos\google\maps\overlays\Polygon;
-use yii\base\BaseObject;
-use yii\base\InvalidParamException;
-use yii\helpers\ArrayHelper;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 
 /**
  * LatLngBounds
  *
- * Google maps bounds object
+ * Represents a geographical bounding box defined by a southwest and northeast points
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- * 
+ * @author Latul Anton <webazex@gmail.com>
  * @link http://www.2amigos.us/
+ * @link https://latul.website/
  * @package dosamigos\google\maps
  */
-class LatLngBounds extends BaseObject
+class LatLngBounds extends Component
 {
     /**
-     * @var LatLng|null South West coordinate
+     * @var \dosamigos\google\maps\LatLng|null the northeast point
      */
-    private $_sw = null;
-    /**
-     * @var null|LatLng North East coordinate
-     */
-    private $_ne = null;
+    public $northEast;
 
     /**
-     * Google String representations
-     * @return string
+     * @var \dosamigos\google\maps\LatLng|null the southwest point
      */
-    public function __toString()
-    {
-        return '((' . $this->getSouthWest()->getLat() . ', ' . $this->getSouthWest()->getLng() . '), ' .
-        '(' . $this->getNorthEast()->getLat() . ', ' . $this->getNorthEast()->getLng() . '))';
-    }
+    public $southWest;
 
     /**
-     * @inheritdoc
+     * @throws \yii\base\InvalidConfigException
+     * @return void
      */
     public function init()
     {
-        if (empty($this->_ne)) {
-            $this->setNorthEast(new LatLng());
-        }
-        if (empty($this->_sw)) {
-            $this->setSouthWest(new LatLng());
+        parent::init();
+        if ($this->northEast === null || $this->southWest === null) {
+            throw new InvalidConfigException('"northEast" and "southWest" cannot be null');
         }
     }
 
     /**
-     *
-     * @return LatLng object
-     */
-    public function getNorthEast()
-    {
-        return $this->_ne;
-    }
-
-    /**
-     * Sets the North East coordinate
-     * @param LatLng $value
+     * Sets the northeast point
+     * @param \dosamigos\google\maps\LatLng $value
+     * @return void
      */
     public function setNorthEast(LatLng $value)
     {
-        $this->_ne = $value;
+        $this->northEast = $value;
     }
 
     /**
-     *
-     * @return LatLng object
-     */
-    public function getSouthWest()
-    {
-        return $this->_sw;
-    }
-
-    /**
-     * Sets the South West coordinate
-     * @param LatLng $value
+     * Sets the southwest point
+     * @param \dosamigos\google\maps\LatLng $value
+     * @return void
      */
     public function setSouthWest(LatLng $value)
     {
-        $this->_sw = $value;
+        $this->southWest = $value;
     }
 
     /**
-     * @return string the js constructor of the object
-     */
-    public function getJs()
-    {
-        $sw = $this->getSouthWest()->getJs();
-        $ne = $this->getNorthEast()->getJs();
-
-        return "new google.maps.LatLngBounds($sw, $ne)";
-    }
-
-    /**
-     * Get the latitude of the center of the zone
-     * @return integer
+     * Returns the latitude of the center
+     * @return int
      */
     public function getCenterLat()
     {
-        return (is_null($this->getSouthWest()) || is_null($this->getNorthEast()))
-            ? null
-            : floatval(($this->getSouthWest()->getLat() + $this->getNorthEast()->getLat()) / 2);
+        return (int)(($this->northEast->lat + $this->southWest->lat) / 2);
     }
 
     /**
-     * Get the longitude of the center of the zone
-     * @return integer
+     * Returns the longitude of the center
+     * @return int
      */
     public function getCenterLng()
     {
-        return (is_null($this->getSouthWest()) || is_null($this->getNorthEast()))
-            ? null
-            : floatval(($this->getSouthWest()->getLng() + $this->getNorthEast()->getLng()) / 2);
+        return (int)(($this->northEast->lng + $this->southWest->lng) / 2);
     }
 
     /**
-     * Get the coordinates of the center of the zone
-     * @return LatLng
+     * Returns the zoom level
+     * @param int $mapWidth
+     * @param int $mapHeight
+     * @return int
      */
-    public function getCenterCoordinates()
+    public function getZoom($mapWidth, $mapHeight)
     {
-        return new LatLng(['lat' => $this->getCenterLat(), 'lng' => $this->getCenterLng()]);
+        $WORLD_DIM = ['width' => 256, 'height' => 256];
+        $ZOOM_MAX = 21;
+
+        $latFraction = (sin(($this->northEast->lat - $this->southWest->lat) * M_PI / 360) / 2);
+        $lngFraction = (($this->northEast->lng - $this->southWest->lng) / 360);
+
+        $latZoom = floor(log($mapHeight / $WORLD_DIM['height'] / $latFraction) / log(2));
+        $lngZoom = floor(log($mapWidth / $WORLD_DIM['width'] / $lngFraction) / log(2));
+
+        return (int)min($latZoom, $lngZoom, $ZOOM_MAX);
     }
 
     /**
-     * Returns the height of boundaries zone
+     * Returns the JavaScript code for the bounds
+     * @return string
+     */
+    public function getJs()
+    {
+        $sw = $this->southWest->getJs();
+        $ne = $this->northEast->getJs();
+        return "new google.maps.LatLngBounds({$sw}, {$ne})";
+    }
+
+    /**
+     * Converts pixels to latitude
+     * @param int $pixelYZoom
+     * @param int $zoom
      * @return float
      */
-    public function getHeight()
+    public static function pixelsToLat($pixelYZoom, $zoom)
     {
-        return abs($this->getNorthEast()->getLat() - $this->getSouthWest()->getLat());
+        $mapSize = 1 << $zoom;
+        $lat = (M_PI / 2) - (2 * atan(exp((($pixelYZoom / $mapSize) - 0.5) * (2 * M_PI))));
+        return $lat * 180 / M_PI;
     }
 
     /**
-     * Returns the width of boundaries zone
+     * Converts pixels to longitude
+     * @param int $pixelXZoom
+     * @param int $zoom
      * @return float
      */
-    public function getWidth()
+    public static function pixelsToLng($pixelXZoom, $zoom)
     {
-        return abs($this->getNorthEast()->getLng() - $this->getSouthWest()->getLng());
-    }
-
-    /**
-     * Does a homothety transformation on the bounds, centered on the center of the bounds
-     *
-     * @param float $factor
-     * @return LatLngBounds $bounds
-     */
-    public function getHomothety($factor)
-    {
-        $bounds = new LatLngBounds();
-        $lat = $this->getCenterLat();
-        $lng = $this->getCenterLng();
-        $bounds->getNorthEast()->setLat($factor * $this->getNorthEast()->getLat() + $lat * (1 - $factor));
-        $bounds->getSouthWest()->setLat($factor * $this->getSouthWest()->getLat() + $lat * (1 - $factor));
-        $bounds->getNorthEast()->setLng($factor * $this->getNorthEast()->getLng() + $lng * (1 - $factor));
-        $bounds->getSouthWest()->setLng($factor * $this->getSouthWest()->getLng() + $lng * (1 - $factor));
-
-        return $bounds;
-    }
-
-    /**
-     * Returns zoomed out bounds
-     *
-     * @param int $zoomCoeficient
-     * @return LatLngBounds
-     */
-    public function getZoomOut($zoomCoeficient)
-    {
-        if ($zoomCoeficient > 0) {
-            $bounds = $this->getHomothety(pow(2, $zoomCoeficient));
-            return $bounds;
-        }
-        return $this;
-    }
-
-    /**
-     * Returns the most appropriate zoom to see the bounds on a map with min(width, height) = $minWidthHeight.
-     *
-     * @param int $minWidthHeight width or height of the map in pixels
-     * @param int $default the defaults zoom
-     * @return integer
-     */
-    public function getZoom($minWidthHeight, $default = 14)
-    {
-        $infinity = 999999999;
-        $heightFactor = $infinity;
-        $widthFactor = $infinity;
-
-        /*
-          formula: the width of the bounds in "pixels" is $pixW * 2^z
-          We want $pixW * 2^z to fit in $minWidthHeight so we are looking for
-          z = round ( log2 ( $minWidthHeight / $pixW  ) )
-         */
-
-        $swLatPix = LatLng::latToPixels($this->getSouthWest()->getLat(), 0);
-        $neLatPix = LatLng::latToPixels($this->getNorthEast()->getLat(), 0);
-        $pixH = abs($swLatPix - $neLatPix);
-        if ($pixH > 0) {
-            $heightFactor = $minWidthHeight / $pixH;
-        }
-
-        $swLngPix = LatLng::lngToPixels($this->getSouthWest()->getLng(), 0);
-        $neLngPix = LatLng::lngToPixels($this->getNorthEast()->getLng(), 0);
-        $pixW = abs($swLngPix - $neLngPix);
-        if ($pixW > 0) {
-            $widthFactor = $minWidthHeight / $pixW;
-        }
-
-        $factor = min($widthFactor, $heightFactor);
-
-        // bounds is one point, no zoom can be determined
-        if ($factor == $infinity) {
-            return $default;
-        }
-
-        return round(log($factor, 2));
-    }
-
-    /**
-     *
-     * @param LatLng $coord
-     * @return boolean true if the coordinate is inside boundaries
-     */
-    public function containsCoordinate(LatLng $coord)
-    {
-        return (
-            $coord->getLat() < $this->getNorthEast()->getLat()
-            &&
-            $coord->getLat() > $this->getSouthWest()->getLat()
-            &&
-            $coord->getLng() < $this->getNorthEast()->getLng()
-            &&
-            $coord->getLng() > $this->getSouthWest()->getLng()
-        );
-    }
-
-    /**
-     * Creates a LatLngBounds object from a string representation of ((Lat, Lng), (Lat, Lng)) values. For example:
-     *
-     * ```
-     *  ((48.82415805606007,2.308330535888672),(48.867086142850226,2.376995086669922))
-     * ```
-     *
-     * @param string $string the coordinates representation of boundaries
-     * @return LatLngBounds|null
-     */
-    public static function createFromString($string)
-    {
-        preg_match('/\(\((.*?)\), \((.*?)\)\)/', $string, $matches);
-        if (count($matches) == 3) {
-            $sw = LatLng::createFromString($matches[1]);
-            $ne = LatLng::createFromString($matches[2]);
-            if (!is_null($sw) && !is_null($ne)) {
-                return new self(['southWest' => $sw, 'northEast' => $ne]);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the boundaries of an array of Bound objects
-     *
-     * @param LatLngBounds[] $boundaries
-     * @param float $margin
-     * @throws \yii\base\InvalidParamException
-     * @return LatLngBounds
-     */
-    public static function getBoundsOfBounds($boundaries, $margin = 0.0)
-    {
-        $minLat = 1000;
-        $maxLat = -1000;
-        $minLng = 1000;
-        $maxLng = -1000;
-        foreach ($boundaries as $bounds) {
-            if (!($bounds instanceof LatLngBounds)) {
-                throw new InvalidParamException('"$boundaries" must be an array of "' . self::className() . '" objects');
-            }
-            $minLat = min($minLat, $bounds->getSouthWest()->getLat());
-            $minLng = min($minLng, $bounds->getSouthWest()->getLng());
-            $maxLat = max($maxLat, $bounds->getNorthEast()->getLat());
-            $maxLng = max($maxLng, $bounds->getNorthEast()->getLng());
-        }
-
-        if ($margin > 0) {
-            $minLat = $minLat - $margin * ($maxLat - $minLat);
-            $minLng = $minLng - $margin * ($maxLng - $minLng);
-            $maxLat = $maxLat + $margin * ($maxLat - $minLat);
-            $maxLng = $maxLng + $margin * ($maxLng - $minLng);
-        }
-
-        return new self(
-            [
-                'southWest' => new LatLng(['lat' => $minLat, 'lng' => $minLng]),
-                'northEast' => new LatLng(['lat' => $maxLat, 'lng' => $maxLng])]
-        );
-    }
-
-    /**
-     * Returns the boundaries of an array of LatLng objects
-     * @param LatLng[] $coords
-     * @param float $margin
-     * @throws \yii\base\InvalidParamException
-     * @return LatLngBounds
-     */
-    public static function getBoundsOfCoordinates($coords, $margin = 0.0)
-    {
-        $minLat = 1000;
-        $maxLat = -1000;
-        $minLng = 1000;
-        $maxLng = -1000;
-        foreach ($coords as $coord) {
-            if (!($coord instanceof LatLng)) {
-                throw new InvalidParamException('$coords must be an array of "' . LatLng::className() . '" objects');
-            }
-            /* @var $coord LatLng */
-            $minLat = min($minLat, $coord->getLat());
-            $maxLat = max($maxLat, $coord->getLat());
-            $minLng = min($minLng, $coord->getLng());
-            $maxLng = max($maxLng, $coord->getLng());
-        }
-
-        if ($margin > 0) {
-            $minLat = $minLat - $margin * ($maxLat - $minLat);
-            $minLng = $minLng - $margin * ($maxLng - $minLng);
-            $maxLat = $maxLat + $margin * ($maxLat - $minLat);
-            $maxLng = $maxLng + $margin * ($maxLng - $minLng);
-        }
-        return new self([
-            'southWest' => new LatLng(['lat' => $minLat, 'lng' => $minLng]),
-            'northEast' => new LatLng(['lat' => $maxLat, 'lng' => $maxLng])
-        ]);
-    }
-
-    /**
-     * Returns the boundaries of an array of Marker objects
-     * @param Marker[] $markers
-     * @param float $margin
-     * @throws \yii\base\InvalidParamException
-     * @return LatLngBounds
-     */
-    public static function getBoundsOfMarkers($markers, $margin = 0.0)
-    {
-        $coords = [];
-        foreach ($markers as $marker) {
-            if (!($marker instanceof Marker)) {
-                throw new InvalidParamException('"$markers" must be an array of "' . Marker::className() . '" objects');
-            }
-            $coords[] = $marker->position;
-        }
-
-        return LatLngBounds::getBoundsOfCoordinates($coords, $margin);
-    }
-
-    /**
-     * Returns the boundaries of an array of Polygon objects
-     * @param Polygon[] $polygons array of Polygons
-     * @param float $margin margin factor for the bounds
-     * @throws \yii\base\InvalidParamException
-     * @return LatLngBounds
-     */
-    public static function getBoundsOfPolygons($polygons, $margin = 0.0)
-    {
-        $coords = [];
-        /** @var Polygon $polygon */
-        foreach ($polygons as $polygon) {
-            if (!($polygon instanceof Polygon)) {
-                throw new InvalidParamException('"$polygons" must be an array of "' . Polygon::className() . '" objects');
-            }
-            // merge LatLng arrays
-            $coords = ArrayHelper::merge($coords, $polygon->paths);
-        }
-
-        return LatLngBounds::getBoundsOfCoordinates($coords, $margin);
-    }
-
-    /**
-     * Calculate the bounds corresponding to a specific center and zoom level for a give map size in pixels
-     * @param LatLng $center
-     * @param integer $zoom
-     * @param integer $width
-     * @param integer $height
-     * @return LatLngBounds
-     */
-    public static function getBoundsFromCenterAndZoom(LatLng $center, $zoom, $width, $height = null)
-    {
-        if (is_null($height)) {
-            $height = $width;
-        }
-
-        $centerLat = $center->getLat();
-        $centerLng = $center->getLng();
-
-        $pix = LatLng::latToPixels($centerLat, $zoom);
-        $neLat = LatLng::pixelsToLat($pix - round(($height - 1) / 2), $zoom);
-        $swLat = LatLng::pixelsToLat($pix + round(($height - 1) / 2), $zoom);
-
-        $pix = LatLng::lngToPixels($centerLng, $zoom);
-        $swLng = LatLng::pixelsToLng($pix - round(($width - 1) / 2), $zoom);
-        $neLng = LatLng::pixelsToLng($pix + round(($width - 1) / 2), $zoom);
-
-        return new self([
-            'southWest' => new LatLng(['lat' => $swLat, 'lng' => $swLng]),
-            'northEast' => new LatLng(['lat' => $neLat, 'lng' => $neLng])
-        ]);
+        $mapSize = 1 << $zoom;
+        $lng = ($pixelXZoom / $mapSize - 0.5) * 360;
+        return $lng;
     }
 }

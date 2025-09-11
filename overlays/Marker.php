@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -15,7 +15,7 @@ use dosamigos\google\maps\LatLngBounds;
 use dosamigos\google\maps\OverlayTrait;
 use dosamigos\google\maps\Point;
 use yii\base\InvalidConfigException;
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -48,7 +48,7 @@ use yii\helpers\ArrayHelper;
  * with lower markers appearing in front of markers further up the screen.
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- * 
+ *
  * @link http://www.2amigos.us/
  * @package dosamigos\google\maps
  */
@@ -119,7 +119,7 @@ class Marker extends MarkerOptions
      *
      * @param Marker[] $markers
      *
-     * @throws \yii\base\InvalidParamException
+     * @throws \yii\base\InvalidArgumentException
      * @return LatLng|null
      */
     public static function getCenterOfMarkers($markers)
@@ -127,7 +127,7 @@ class Marker extends MarkerOptions
         $coords = [];
         foreach ($markers as $marker) {
             if (!($marker instanceof Marker)) {
-                throw new InvalidParamException('$markers must be an array of "' . self::className() . '" objects');
+                throw new InvalidArgumentException('$markers must be an array of "' . self::className() . '" objects');
             }
             $coords[] = $marker->position;
         }

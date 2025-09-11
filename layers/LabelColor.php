@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -22,8 +22,8 @@ namespace dosamigos\google\maps\layers;
  */
 class LabelColor
 {
-    const BLACK = 'google.maps.weather.LabelColor.BLACK';
-    const WHITE = 'google.maps.weather.LabelColor.WHITE';
+    public const BLACK = 'google.maps.weather.LabelColor.BLACK';
+    public const WHITE = 'google.maps.weather.LabelColor.WHITE';
 
     /**
      * Checks whether a value is a valid [LabelColor] constant.

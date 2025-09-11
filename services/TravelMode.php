@@ -2,7 +2,7 @@
 
 /*
  *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
  *
@@ -17,16 +17,16 @@ namespace dosamigos\google\maps\services;
  * DirectionsStep.
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- * 
+ *
  * @link http://www.2amigos.us/
  * @package dosamigos\google\maps\services
  */
 class TravelMode
 {
-    const DRIVING = 'google.maps.TravelMode.DRIVING';
-    const WALKING = 'google.maps.TravelMode.WALKING';
-    const TRANSIT = 'google.maps.TravelMode.TRANSIT';
-    const BICYCLING = 'google.maps.TravelMode.BICYCLING';
+    public const DRIVING = 'google.maps.TravelMode.DRIVING';
+    public const WALKING = 'google.maps.TravelMode.WALKING';
+    public const TRANSIT = 'google.maps.TravelMode.TRANSIT';
+    public const BICYCLING = 'google.maps.TravelMode.BICYCLING';
 
     /**
      * Checks whether value is a valid [DirectionsTravelModel] constant.

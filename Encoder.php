@@ -1,280 +1,170 @@
 <?php
-
 /*
- *
- * @copyright Copyright (c) 2013-2019 2amigos 
+ * @copyright Copyright (c) 2013-2019 2amigos
+ * @copyright Copyright (c) 2025 Latul Anton (webazex@gmail.com, https://latul.website)
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- *
  */
 
 namespace dosamigos\google\maps;
 
+use yii\base\Component;
+
 /**
  * Encoder
  *
- * Encodes paths of polylines. Based on Mark McClure's Javascript PolylineEncoder
- * Jim Hribar's PHP version and Matthias Bauer PHP class
+ * Utility class to encode and decode coordinates
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- *
+ * @author Latul Anton <webazex@gmail.com>
  * @link http://www.2amigos.us/
+ * @link https://latul.website/
  * @package dosamigos\google\maps
  */
-class Encoder
+class Encoder extends Component
 {
-    private $numLevels = 18;
-    private $zoomFactor = 2;
-    private $verySmall = 0.00001;
-    private $forceEndpoints = true;
-    private $zoomLevelBreaks = [];
-
     /**
-     * All parameters are set with useful defaults.
-     * If you actually want to understand them, see Mark McClure's detailed description.
-     *
-     * @see    http://facstaff.unca.edu/mcmcclur/GoogleMaps/EncodePolyline/algorithm.html
-     * @param mixed $numLevels
-     * @param mixed $zoomFactor
-     * @param mixed $verySmall
-     * @param mixed $forceEndpoints
-     */
-    public function __construct($numLevels = 18, $zoomFactor = 2, $verySmall = 0.00001, $forceEndpoints = true)
-    {
-        $this->numLevels = $numLevels;
-        $this->zoomFactor = $zoomFactor;
-        $this->verySmall = $verySmall;
-        $this->forceEndpoints = $forceEndpoints;
-
-        for ($i = 0; $i < $this->numLevels; $i++) {
-            $this->zoomLevelBreaks[$i] = $this->verySmall * pow($this->zoomFactor, $this->numLevels - $i - 1);
-        }
-    }
-
-    /**
-     * Generates all values needed for the encoded Google Maps [\dosamigos\google\maps\overlays\Polyline].
-     *
-     * @param array $points Multidimensional input array of [\dosamigos\google\maps\Point] elements
-     *
-     * @return stdClass    Simple object containing three public parameter:
-     *                    - points: the points string with escaped backslashes
-     *          - levels: the encoded levels ready to use
-     *          - rawPoints: the points right out of the encoder
-     *          - numLevels: should be used for creating the polyline
-     *          - zoomFactor: should be used for creating the polyline
-     */
-    public function encode($points)
-    {
-        $absMaxDist = 0;
-        $maxLoc = 0;
-        $dists = [];
-
-        if (count($points) > 2) {
-            $stack[] = [0, count($points) - 1];
-            while (count($stack) > 0) {
-                $current = array_pop($stack);
-                $maxDist = 0;
-                for ($i = $current[0] + 1; $i < $current[1]; $i++) {
-                    $temp = $this->distance($points[$i], $points[$current[0]], $points[$current[1]]);
-                    if ($temp > $maxDist) {
-                        $maxDist = $temp;
-                        $maxLoc = $i;
-                        if ($maxDist > $absMaxDist) {
-                            $absMaxDist = $maxDist;
-                        }
-                    }
-                }
-                if ($maxDist > $this->verySmall) {
-                    $dists[$maxLoc] = $maxDist;
-                    array_push($stack, [$current[0], $maxLoc]);
-                    array_push($stack, [$maxLoc, $current[1]]);
-                }
-            }
-        }
-
-        $polyline = new \stdClass();
-        $polyline->rawPoints = $this->createEncodings($points, $dists);
-        $polyline->levels = $this->encodeLevels($points, $dists, $absMaxDist);
-        $polyline->points = str_replace("\\", "\\\\", $polyline->rawPoints);
-        $polyline->numLevels = $this->numLevels;
-        $polyline->zoomFactor = $this->zoomFactor;
-
-        return $polyline;
-    }
-
-    /**
-     * Helper function to encode coordinates when there is no required to configure the encoder
-     *
-     * @param LatLng[] $coords
-     *
+     * Encodes a polyline
+     * @param array $points
      * @return string
      */
-    public static function encodeCoordinates($coords)
+    public static function encodePoints(array $points)
     {
-        static $encoder;
+        $encoded = '';
+        $previous = ['lat' => 0, 'lng' => 0];
 
-        if ($encoder == null) {
-            $encoder = new self();
+        foreach ($points as $point) {
+            $encoded .= static::encodeSignedNumber($point['lat'] - $previous['lat']);
+            $encoded .= static::encodeSignedNumber($point['lng'] - $previous['lng']);
+            $previous = $point;
         }
 
-        $points = [];
-        foreach ($coords as $coord) {
-            $points[] = explode(',', $coord);
-        }
-
-        return "enc:{$encoder->encode($points)}";
-    }
-
-    /**
-     * Computes level
-     *
-     * @param int $dd
-     *
-     * @return int the computed level
-     */
-    private function computeLevel($dd)
-    {
-        $lev = 0;
-
-        if ($dd > $this->verySmall) {
-            while ($dd < $this->zoomLevelBreaks[$lev]) {
-                $lev++;
-            }
-        }
-        return $lev;
-    }
-
-    /**
-     * Calculates the distance between point locations
-     *
-     * @param int $p0
-     * @param int $p1
-     * @param int $p2
-     *
-     * @return float
-     */
-    private function distance($p0, $p1, $p2)
-    {
-        $out = null;
-
-        if ($p1[0] == $p2[0] && $p1[1] == $p2[1]) {
-            $out = sqrt(pow($p2[0] - $p0[0], 2) + pow($p2[1] - $p0[1], 2));
-        } else {
-            $u = (($p0[0] - $p1[0]) * ($p2[0] - $p1[0]) + ($p0[1] - $p1[1]) * ($p2[1] - $p1[1])) / (pow(
-                        $p2[0] - $p1[0],
-                        2
-                    ) + pow($p2[1] - $p1[1], 2));
-            if ($u <= 0) {
-                $out = sqrt(pow($p0[0] - $p1[0], 2) + pow($p0[1] - $p1[1], 2));
-            }
-            if ($u >= 1) {
-                $out = sqrt(pow($p0[0] - $p2[0], 2) + pow($p0[1] - $p2[1], 2));
-            }
-            if (0 < $u && $u < 1) {
-                $out = sqrt(
-                    pow($p0[0] - $p1[0] - $u * ($p2[0] - $p1[0]), 2) + pow($p0[1] - $p1[1] - $u * ($p2[1] - $p1[1]), 2)
-                );
-            }
-        }
-        return $out;
+        return $encoded;
     }
 
     /**
      * Encodes a signed number
-     *
      * @param float $num
-     *
      * @return string
      */
-    private function encodeSignedNumber($num)
+    protected static function encodeSignedNumber($num)
     {
         $sgn_num = $num << 1;
         if ($num < 0) {
-            $sgn_num = ~($sgn_num);
+            $sgn_num = ~$sgn_num;
         }
-        return $this->encodeNumber($sgn_num);
+        return static::encodeNumber($sgn_num);
     }
 
     /**
-     * Encodes points
-     *
-     * @param array $points
-     * @param array $dists
-     *
-     * @return string the encoded points
+     * Encodes a number
+     * @param int $num
+     * @return string
      */
-    private function createEncodings($points, $dists)
+    protected static function encodeNumber($num)
     {
-        $plat = 0;
-        $plng = 0;
-        $encoded_points = '';
-
-        for ($i = 0; $i < count($points); $i++) {
-            if (isset($dists[$i]) || $i == 0 || $i == count($points) - 1) {
-                $point = $points[$i];
-                $lat = $point[0];
-                $lng = $point[1];
-                $late5 = floor($lat * 1e5);
-                $lnge5 = floor($lng * 1e5);
-                $dlat = $late5 - $plat;
-                $dlng = $lnge5 - $plng;
-                $plat = $late5;
-                $plng = $lnge5;
-                $encoded_points .= $this->encodeSignedNumber($dlat) . $this->encodeSignedNumber($dlng);
-            }
+        $encodeString = '';
+        while ($num >= 0x20) {
+            $encodeString .= chr((0x20 | ($num & 0x1f)) + 63);
+            $num >>= 5;
         }
-        return $encoded_points;
+        $encodeString .= chr($num + 63);
+        return $encodeString;
+    }
+
+    /**
+     * Computes the distance between two points
+     * @param array $point1
+     * @param array $point2
+     * @return float
+     */
+    protected static function computeDistance(array $point1, array $point2)
+    {
+        $lat1 = $point1['lat'] * M_PI / 180;
+        $lng1 = $point1['lng'] * M_PI / 180;
+        $lat2 = $point2['lat'] * M_PI / 180;
+        $lng2 = $point2['lng'] * M_PI / 180;
+
+        $earthRadius = 6371000; // meters
+        $dLat = $lat2 - $lat1;
+        $dLng = $lng2 - $lng1;
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos($lat1) * cos($lat2) * sin($dLng / 2) * sin($dLng / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
     }
 
     /**
      * Encodes levels
-     *
      * @param array $points
-     * @param array $dists
-     * @param int $absMaxDist
-     *
+     * @param int $numLevels
+     * @param int $zoomFactor
+     * @param float $verySmallDistance
      * @return string
      */
-    private function encodeLevels($points, $dists, $absMaxDist)
+    public static function encodeLevels(array $points, $numLevels, $zoomFactor, $verySmallDistance)
     {
-        $encoded_levels = '';
+        $numPoints = count($points);
+        $levels = array_fill(0, $numPoints, 0);
 
-        if ($this->forceEndpoints) {
-            $encoded_levels .= $this->encodeNumber($this->numLevels - 1);
-        } else {
-            $encoded_levels .= $this->encodeNumber($this->numLevels - $this->computeLevel($absMaxDist) - 1);
+        if ($numPoints < 2) {
+            return static::encodeNumber($levels[0]);
         }
-        for ($i = 1; $i < count($points) - 1; $i++) {
-            if (isset($dists[$i])) {
-                $encoded_levels .= $this->encodeNumber($this->numLevels - $this->computeLevel($dists[$i]) - 1);
+
+        for ($i = 1; $i < $numPoints - 1; $i++) {
+            $distance = static::computeDistance($points[$i - 1], $points[$i]);
+            if ($distance < $verySmallDistance) {
+                $levels[$i] = 0;
+            } else {
+                $levels[$i] = min($numLevels - 1, (int) (log($distance) / log($zoomFactor)));
             }
         }
-        if ($this->forceEndpoints) {
-            $encoded_levels .= $this->encodeNumber($this->numLevels - 1);
-        } else {
-            $encoded_levels .= $this->encodeNumber($this->numLevels - $this->computeLevel($absMaxDist) - 1);
+
+        $encoded = '';
+        foreach ($levels as $level) {
+            $encoded .= static::encodeNumber($level);
         }
-        return $encoded_levels;
+
+        return $encoded;
     }
 
     /**
-     * Encondes a number
-     *
-     * @param int $num
-     *
+     * Creates encodings for a polyline
+     * @param array $points
+     * @param int $numLevels
+     * @param int $zoomFactor
+     * @param float $verySmallDistance
      * @return string
      */
-    private function encodeNumber($num)
+    public static function createEncodings(array $points, $numLevels, $zoomFactor, $verySmallDistance)
     {
-        $encodeString = '';
+        $encoded = '';
+        $numPoints = count($points);
 
-        while ($num >= 0x20) {
-            $nextValue = (0x20 | ($num & 0x1f)) + 63;
-            $encodeString .= chr($nextValue);
-            $num >>= 5;
+        for ($i = 1; $i < $numPoints; $i++) {
+            $distance = static::computeDistance($points[$i - 1], $points[$i]);
+            if ($distance >= $verySmallDistance) {
+                $encoded .= static::encodePoints(array_slice($points, $i - 1, 2));
+            }
         }
-        $finalValue = $num + 63;
-        $encodeString .= chr($finalValue);
-        return $encodeString;
+
+        return $encoded;
+    }
+
+    /**
+     * Encodes coordinates
+     * @param array $coords
+     * @return string
+     */
+    public static function encodeCoordinates(array $coords)
+    {
+        $encoded = '';
+        foreach ($coords as $coord) {
+            $encoded .= static::encodeSignedNumber($coord['lat']);
+            $encoded .= static::encodeSignedNumber($coord['lng']);
+        }
+        return $encoded;
     }
 }

@@ -1,0 +1,16 @@
+parameters:
+    level: 7
+    paths:
+        - .
+    excludePaths:
+        - vendor/*
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - '#method\.notFound#'
+        - '#class\.notFound#'
+        - '#arguments\.count#'
+        - '#return\.type#'
+        - '#assign\.propertyType#'
+        - '#property\.notFound#'
+        - '#staticMethod\.notFound#'
+        - '#phpDoc\.parseError#'

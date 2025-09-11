@@ -205,3 +205,8 @@ your php files, simply do:
 > [![2amigOS!](http://www.gravatar.com/avatar/55363394d72945ff7ed312556ec041e0.png)](http://www.2amigos.us)  
 <i>beyond software</i>  
 [www.2amigos.us](http://www.2amigos.us)
+> 
+
+> ## Authors
+- Antonio Ramirez <hola@2amigos.us>[](http://2amigos.us/) (original code)
+- Latul Anton <webazex@gmail.com>[](https://latul.website/) (change code to compatibility with php8.2)

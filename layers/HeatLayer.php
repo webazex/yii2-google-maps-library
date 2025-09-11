@@ -11,6 +11,7 @@
 namespace dosamigos\google\maps\layers;
 
 use yii\base\InvalidConfigException;
+
 /**
  * HeatLayer
  *
