@@ -35,7 +35,7 @@ class Map extends Component
     /**
      * @var string the HTML id attribute of the div where the map will be rendered
      */
-    public $containerId = 'map';  // По умолчанию 'map'
+    public $containerId = 'map-container';  // По умолчанию 'map'
 
     /**
      * @var float the initial center latitude
