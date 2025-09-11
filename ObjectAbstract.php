@@ -8,13 +8,13 @@
 
 namespace dosamigos\google\maps;
 
-use Yii;
-use yii\web\AssetBundle;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 
 /**
- * MapAsset
+ * ObjectAbstract
  *
- * Registers the Google Maps Javascript API
+ * Base class for all Google Maps objects
  *
  * @author Antonio Ramirez <hola@2amigos.us>
  * @author Latul Anton <webazex@gmail.com>
@@ -22,33 +22,89 @@ use yii\web\AssetBundle;
  * @link https://latul.website/
  * @package dosamigos\google\maps
  */
-class MapAsset extends AssetBundle
+abstract class ObjectAbstract extends Component
 {
     /**
-     * @var string the source path
+     * @var string the name of the object (used for JavaScript variable)
      */
-    public $sourcePath = '@vendor/2amigos/yii2-google-maps-library/assets';
+    public $name;
 
     /**
-     * @var array<string, mixed> the bundle options
+     * @var array the configuration options for the object
      */
     public $options = [];
 
     /**
+     * @var array the events associated with the object
+     */
+    public $events = [];
+
+    /**
+     * @throws \yii\base\InvalidConfigException
      * @return void
      */
     public function init()
     {
         parent::init();
-        $key = isset($this->options['key']) ? $this->options['key'] : '';
-        $this->js = [
-            'https://maps.googleapis.com/maps/api/js?key=' . $key
-        ];
-        if (isset(Yii::$app->params['googleMapsLanguage'])) {
-            $this->js[0] .= '&language=' . Yii::$app->params['googleMapsLanguage'];
+        if ($this->name === null) {
+            throw new InvalidConfigException('"name" cannot be null');
         }
-        if (isset(Yii::$app->params['googleMapsLibraries'])) {
-            $this->js[0] .= '&libraries=' . implode(',', Yii::$app->params['googleMapsLibraries']);
-        }
+    }
+
+    /**
+     * Sets the name of the object
+     * @param string $value
+     * @return void
+     */
+    public function setName($value)
+    {
+        $this->name = $value;
+    }
+
+    /**
+     * Sets the events
+     * @param array $value
+     * @return void
+     */
+    public function setEvents(array $value)
+    {
+        $this->events = $value;
+    }
+
+    /**
+     * Adds an event to the object
+     * @param Event $event
+     * @return void
+     */
+    public function addEvent(Event $event)
+    {
+        $this->events[] = $event;
+    }
+
+    /**
+     * Returns the JavaScript code for the object
+     * @return string
+     */
+    public function getJs()
+    {
+        return '';
+    }
+
+    /**
+     * Encodes the options as JSON
+     * @return string
+     */
+    public function encode()
+    {
+        return json_encode($this->options);
+    }
+
+    /**
+     * Returns the encoded options
+     * @return string
+     */
+    public function getEncodedOptions()
+    {
+        return $this->encode();
     }
 }

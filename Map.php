@@ -8,7 +8,6 @@
 
 namespace dosamigos\google\maps;
 
-use dosamigos\google\maps\services\StreetViewPanorama;
 use dosamigos\google\maps\ObjectAbstract;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -82,7 +81,21 @@ class Map extends Component
             $center = $config['center'];
             $this->centerLat = $center->lat;
             $this->centerLng = $center->lng;
-            unset($config['center']);  // Удаляем 'center', чтобы избежать ошибки
+            unset($config['center']);  // Удаляем, чтобы избежать ошибки
+        }
+
+        // Обработка 'width' и 'height' для совместимости
+        $style = '';
+        if (isset($config['width'])) {
+            $style .= 'width: ' . $config['width'] . '; ';
+            unset($config['width']);
+        }
+        if (isset($config['height'])) {
+            $style .= 'height: ' . $config['height'] . '; ';
+            unset($config['height']);
+        }
+        if (!empty($style)) {
+            $config['containerOptions']['style'] = $style . (isset($config['containerOptions']['style']) ? $config['containerOptions']['style'] : '');
         }
 
         parent::__construct($config);
