@@ -12,6 +12,7 @@ use dosamigos\google\maps\services\StreetViewPanorama;
 use dosamigos\google\maps\ObjectAbstract;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\web\View;
 
 /**
  * Map
@@ -75,6 +76,11 @@ class Map extends Component
      * @var array<\dosamigos\google\maps\ObjectAbstract> the overlays to attach to the map
      */
     public $overlays = [];
+
+    /**
+     * @var array<string> the additional JavaScript code to append to the map
+     */
+    public $js = [];
 
     /**
      * @param array $config
@@ -194,5 +200,45 @@ class Map extends Component
     public function addEvent(Event $event)
     {
         $this->events[] = $event;
+    }
+
+    /**
+     * Appends a script to the map
+     * @param string $js
+     * @return void
+     */
+    public function appendScript($js)
+    {
+        $this->js[] = $js;
+    }
+
+    /**
+     * Displays the map (outputs HTML + JS)
+     * @return string
+     */
+    public function display()
+    {
+        $html = '<div id="' . $this->containerId . '"' . $this->getContainerAttributes() . '></div>';
+        $html .= '<script>' . $this->getJs() . '</script>';
+
+        // Добавляем дополнительные скрипты из appendScript
+        foreach ($this->js as $script) {
+            $html .= '<script>' . $script . '</script>';
+        }
+
+        return $html;
+    }
+
+    /**
+     * Returns the container attributes
+     * @return string
+     */
+    protected function getContainerAttributes()
+    {
+        $attributes = [];
+        foreach ($this->containerOptions as $key => $value) {
+            $attributes[] = $key . '="' . $value . '"';
+        }
+        return implode(' ', $attributes);
     }
 }
