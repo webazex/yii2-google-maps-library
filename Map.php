@@ -11,6 +11,7 @@ namespace dosamigos\google\maps;
 use dosamigos\google\maps\services\StreetViewPanorama;
 use dosamigos\google\maps\ObjectAbstract;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 
 /**
  * Map
@@ -71,6 +72,23 @@ class Map extends Component
     public $overlays = [];
 
     /**
+     * @param array $config
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function __construct($config = [])
+    {
+        // Обработка 'center' для совместимости с существующим кодом сайта
+        if (isset($config['center']) && $config['center'] instanceof LatLng) {
+            $center = $config['center'];
+            $this->centerLat = $center->lat;
+            $this->centerLng = $center->lng;
+            unset($config['center']);  // Удаляем 'center', чтобы избежать ошибки
+        }
+
+        parent::__construct($config);
+    }
+
+    /**
      * @throws \yii\base\InvalidConfigException
      * @return void
      */
@@ -78,10 +96,10 @@ class Map extends Component
     {
         parent::init();
         if ($this->containerId === null) {
-            throw new \yii\base\InvalidConfigException('"containerId" cannot be null');
+            throw new InvalidConfigException('"containerId" cannot be null');
         }
         if (!in_array($this->mapType, ['roadmap', 'satellite', 'hybrid', 'terrain'])) {
-            throw new \yii\base\InvalidConfigException('Invalid "mapType". Must be one of: roadmap, satellite, hybrid, terrain');
+            throw new InvalidConfigException('Invalid "mapType". Must be one of: roadmap, satellite, hybrid, terrain');
         }
     }
 
@@ -103,7 +121,7 @@ class Map extends Component
 
         foreach ($this->overlays as $overlay) {
             if ($overlay instanceof ObjectAbstract) {
-                $js .= $overlay->getJs();
+                $js .= $overlay->getJs($this->containerId);
             }
         }
 
