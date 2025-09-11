@@ -1,5 +1,5 @@
 {
-    "name": "2amigos/yii2-google-maps-library",
+    "name": "webazex/yii2-google-maps-library",
     "description": "Google Maps API library for Yii2.",
     "keywords": [
         "yii",
@@ -34,7 +34,7 @@
         "ext-SimpleXML": "*",
         "ext-json": "*",
         "guzzlehttp/guzzle": "^7.8",
-        "yiisoft/yii2": "22.0.x-dev"
+        "yiisoft/yii2": "^2.0.6"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
