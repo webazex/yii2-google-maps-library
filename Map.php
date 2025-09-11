@@ -27,6 +27,11 @@ use yii\base\InvalidConfigException;
 class Map extends Component
 {
     /**
+     * @var string the name of the map object (for JavaScript variable)
+     */
+    public $name;
+
+    /**
      * @var string the HTML id attribute of the div where the map will be rendered
      */
     public $containerId = 'map';  // По умолчанию 'map'
@@ -112,6 +117,19 @@ class Map extends Component
         if (!in_array($this->mapType, ['roadmap', 'satellite', 'hybrid', 'terrain'])) {
             throw new InvalidConfigException('Invalid "mapType". Must be one of: roadmap, satellite, hybrid, terrain');
         }
+        // Генерируем $name, если не задано
+        if ($this->name === null) {
+            $this->name = 'map' . uniqid();  // Уникальное имя, например 'map64f1a2b3c4d5e'
+        }
+    }
+
+    /**
+     * Returns the name of the map object
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -122,11 +140,11 @@ class Map extends Component
     {
         $center = new LatLng(['lat' => $this->centerLat, 'lng' => $this->centerLng]);
         $options = $this->getOptions();
-        $js = "var {$this->containerId} = new google.maps.Map(document.getElementById('{$this->containerId}'), {$options});";
+        $js = "var {$this->name} = new google.maps.Map(document.getElementById('{$this->containerId}'), {$options});";
 
         foreach ($this->events as $event) {
             if ($event instanceof Event) {
-                $js .= $event->getJs($this->containerId);
+                $js .= $event->getJs($this->name);
             }
         }
 
