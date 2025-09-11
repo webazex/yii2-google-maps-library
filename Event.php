@@ -10,6 +10,7 @@ namespace dosamigos\google\maps;
 
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\web\JsExpression;
 
 /**
  * Event
@@ -30,14 +31,34 @@ class Event extends Component
     public $name;
 
     /**
-     * @var string the JavaScript event handler
+     * @var string|JsExpression the JavaScript event handler
      */
     public $handler;
 
     /**
      * @var string the type of the event
      */
-    public $type;
+    public $type = 'google.maps.event';
+
+    /**
+     * @var mixed the trigger for the event (for backward compatibility with site code)
+     */
+    public $trigger;
+
+    /**
+     * @param array $config
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function __construct($config = [])
+    {
+        // Обработка 'trigger' для совместимости с существующим кодом сайта
+        if (isset($config['trigger'])) {
+            $this->trigger = $config['trigger'];
+            unset($config['trigger']);  // Удаляем, чтобы избежать ошибки
+        }
+
+        parent::__construct($config);
+    }
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -68,7 +89,7 @@ class Event extends Component
      */
     public function getJs($map)
     {
-        $type = $this->type ?: 'google.maps.event';
-        return "{$type}.addListener({$map}, '{$this->name}', {$this->handler});";
+        $handler = $this->handler instanceof JsExpression ? $this->handler : new JsExpression($this->handler);
+        return "{$this->type}.addListener({$map}, '{$this->name}', {$handler});";
     }
 }
