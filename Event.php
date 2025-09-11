@@ -58,13 +58,13 @@ class Event extends Component
     {
         // Обработка 'trigger' как синонима для 'name'
         if (isset($config['trigger'])) {
-            $config['name'] = $config['trigger'];
+            $this->name = $config['trigger'];
             unset($config['trigger']);
         }
 
         // Обработка 'js' как синонима для 'handler'
         if (isset($config['js'])) {
-            $config['handler'] = $config['js'];
+            $this->handler = $config['js'];
             unset($config['js']);
         }
 

@@ -8,6 +8,7 @@
 
 namespace dosamigos\google\maps;
 
+use dosamigos\google\maps\services\StreetViewPanorama;
 use dosamigos\google\maps\ObjectAbstract;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -28,7 +29,7 @@ class Map extends Component
     /**
      * @var string the HTML id attribute of the div where the map will be rendered
      */
-    public $containerId;
+    public $containerId = 'map';  // По умолчанию 'map'
 
     /**
      * @var float the initial center latitude
@@ -76,12 +77,12 @@ class Map extends Component
      */
     public function __construct($config = [])
     {
-        // Обработка 'center' для совместимости с существующим кодом сайта
+        // Обработка 'center' для совместимости
         if (isset($config['center']) && $config['center'] instanceof LatLng) {
             $center = $config['center'];
             $this->centerLat = $center->lat;
             $this->centerLng = $center->lng;
-            unset($config['center']);  // Удаляем, чтобы избежать ошибки
+            unset($config['center']);
         }
 
         // Обработка 'width' и 'height' для совместимости
@@ -108,9 +109,6 @@ class Map extends Component
     public function init()
     {
         parent::init();
-        if ($this->containerId === null) {
-            throw new InvalidConfigException('"containerId" cannot be null');
-        }
         if (!in_array($this->mapType, ['roadmap', 'satellite', 'hybrid', 'terrain'])) {
             throw new InvalidConfigException('Invalid "mapType". Must be one of: roadmap, satellite, hybrid, terrain');
         }
@@ -168,5 +166,15 @@ class Map extends Component
     public function registerAssetBundle($view)
     {
         MapAsset::register($view);
+    }
+
+    /**
+     * Adds an event to the map
+     * @param Event $event
+     * @return void
+     */
+    public function addEvent(Event $event)
+    {
+        $this->events[] = $event;
     }
 }
