@@ -46,15 +46,32 @@ class Event extends Component
     public $trigger;
 
     /**
+     * @var bool whether to wrap the handler in a function (for backward compatibility)
+     */
+    public $wrap = true;
+
+    /**
      * @param array $config
      * @throws \yii\base\InvalidConfigException
      */
     public function __construct($config = [])
     {
-        // Обработка 'trigger' для совместимости с существующим кодом сайта
+        // Обработка 'trigger' для совместимости
         if (isset($config['trigger'])) {
             $this->trigger = $config['trigger'];
-            unset($config['trigger']);  // Удаляем, чтобы избежать ошибки
+            unset($config['trigger']);
+        }
+
+        // Обработка 'js' как синонима для 'handler'
+        if (isset($config['js'])) {
+            $this->handler = $config['js'];
+            unset($config['js']);
+        }
+
+        // Обработка 'wrap' для совместимости
+        if (isset($config['wrap'])) {
+            $this->wrap = (bool)$config['wrap'];
+            unset($config['wrap']);
         }
 
         parent::__construct($config);
@@ -90,6 +107,8 @@ class Event extends Component
     public function getJs($map)
     {
         $handler = $this->handler instanceof JsExpression ? $this->handler : new JsExpression($this->handler);
-        return "{$this->type}.addListener({$map}, '{$this->name}', {$handler});";
+        // Учитываем wrap: если false, не обёртываем в функцию
+        $jsCode = $this->wrap ? $handler : $handler->expression;
+        return "{$this->type}.addListener({$map}, '{$this->name}', {$jsCode});";
     }
 }
