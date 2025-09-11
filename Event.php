@@ -56,15 +56,15 @@ class Event extends Component
      */
     public function __construct($config = [])
     {
-        // Обработка 'trigger' для совместимости
+        // Обработка 'trigger' как синонима для 'name'
         if (isset($config['trigger'])) {
-            $this->trigger = $config['trigger'];
+            $config['name'] = $config['trigger'];
             unset($config['trigger']);
         }
 
         // Обработка 'js' как синонима для 'handler'
         if (isset($config['js'])) {
-            $this->handler = $config['js'];
+            $config['handler'] = $config['js'];
             unset($config['js']);
         }
 
