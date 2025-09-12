@@ -37,6 +37,56 @@ class Circle extends ObjectAbstract
     public $radius;
 
     /**
+     * @var string the stroke color (hex, e.g., '#FF0000')
+     */
+    public $strokeColor;
+
+    /**
+     * @var float the stroke opacity (0.0 to 1.0)
+     */
+    public $strokeOpacity;
+
+    /**
+     * @var int the stroke weight in pixels
+     */
+    public $strokeWeight;
+
+    /**
+     * @var string the fill color (hex, e.g., '#FF0000')
+     */
+    public $fillColor;
+
+    /**
+     * @var float the fill opacity (0.0 to 1.0)
+     */
+    public $fillOpacity;
+
+    /**
+     * @var bool whether the circle is clickable
+     */
+    public $clickable;
+
+    /**
+     * @var bool whether the circle is draggable
+     */
+    public $draggable;
+
+    /**
+     * @var bool whether the circle is editable
+     */
+    public $editable;
+
+    /**
+     * @var bool whether the circle is visible
+     */
+    public $visible;
+
+    /**
+     * @var int the z-index of the circle
+     */
+    public $zIndex;
+
+    /**
      * @param array $config
      * @throws \yii\base\InvalidConfigException
      */
@@ -57,18 +107,30 @@ class Circle extends ObjectAbstract
             'zIndex' => null,
         ], $this->options);
 
-        parent::__construct($config);
+        // Обработка свойств стилизации
+        foreach (['strokeColor', 'strokeOpacity', 'strokeWeight', 'fillColor', 'fillOpacity', 'clickable', 'draggable', 'editable', 'visible', 'zIndex'] as $property) {
+            if (isset($config[$property])) {
+                $this->$property = $config[$property];
+                $this->options[$property] = $config[$property];
+                unset($config[$property]);
+            }
+        }
 
         // Обработка 'center' для совместимости
         if (isset($config['center']) && $config['center'] instanceof LatLng) {
             $this->center = $config['center'];
             $this->options['center'] = $this->center->getJs();
+            unset($config['center']);
         }
+
         // Обработка 'radius'
         if (isset($config['radius'])) {
             $this->radius = (float)$config['radius'];
             $this->options['radius'] = $this->radius;
+            unset($config['radius']);
         }
+
+        parent::__construct($config);
     }
 
     /**
@@ -106,6 +168,61 @@ class Circle extends ObjectAbstract
     {
         $this->radius = (float)$value;
         $this->options['radius'] = $this->radius;
+    }
+
+    /**
+     * Sets the stroke color of the circle
+     * @param string $value
+     * @return void
+     */
+    public function setStrokeColor($value)
+    {
+        $this->strokeColor = $value;
+        $this->options['strokeColor'] = $value;
+    }
+
+    /**
+     * Sets the stroke opacity of the circle
+     * @param float $value
+     * @return void
+     */
+    public function setStrokeOpacity($value)
+    {
+        $this->strokeOpacity = (float)$value;
+        $this->options['strokeOpacity'] = $this->strokeOpacity;
+    }
+
+    /**
+     * Sets the stroke weight of the circle
+     * @param int $value
+     * @return void
+     */
+    public function setStrokeWeight($value)
+    {
+        $this->strokeWeight = (int)$value;
+        $this->options['strokeWeight'] = $this->strokeWeight;
+    }
+
+    /**
+     * Sets the fill color of the circle
+     * @param string $value
+     * @return void
+     */
+    public function setFillColor($value)
+    {
+        $this->fillColor = $value;
+        $this->options['fillColor'] = $value;
+    }
+
+    /**
+     * Sets the fill opacity of the circle
+     * @param float $value
+     * @return void
+     */
+    public function setFillOpacity($value)
+    {
+        $this->fillOpacity = (float)$value;
+        $this->options['fillOpacity'] = $this->fillOpacity;
     }
 
     /**
