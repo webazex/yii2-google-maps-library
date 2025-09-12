@@ -31,6 +31,19 @@ class Circle extends CircleOptions
      * @inheritdoc
      * @throws \yii\base\InvalidConfigException
      */
+
+    private $_center;
+
+    public function setCenter(LatLng $center)
+    {
+        $this->_center = $center;
+        $this->options['center'] = $center;
+    }
+
+    public function getCenter()
+    {
+        return $this->_center;
+    }
     public function init()
     {
         if ($this->center == null) {
