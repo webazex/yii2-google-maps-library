@@ -50,6 +50,5 @@ class MapAsset extends AssetBundle
         if (isset(Yii::$app->params['googleMapsLibraries'])) {
             $this->js[0] .= '&libraries=' . implode(',', Yii::$app->params['googleMapsLibraries']);
         }
-        var_dump($this->js); die("ddd");
     }
 }
