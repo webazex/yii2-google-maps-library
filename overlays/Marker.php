@@ -11,7 +11,9 @@ namespace dosamigos\google\maps\overlays;
 
 use dosamigos\google\maps\Event;
 use dosamigos\google\maps\LatLng;
-use dosamigos\google\maps\ObjectAbstract;/**
+use dosamigos\google\maps\ObjectAbstract;
+
+/**
  * Marker
  *
  * A marker identifies a location on a map. By default, it uses an icon with the Google Maps logo.
@@ -22,7 +24,6 @@ use dosamigos\google\maps\ObjectAbstract;/**
  * @link https://latul.website/
  * @package dosamigos\google\maps
  */
-
 class Marker extends ObjectAbstract
 {
     /**
@@ -36,14 +37,19 @@ class Marker extends ObjectAbstract
     public $title;
 
     /**
+     * @var string the icon URL or options for the marker (for backward compatibility)
+     */
+    public $icon;
+
+    /**
      * @var \dosamigos\google\maps\overlays\InfoWindow the info window to attach to the marker
      */
     public $infoWindow;
 
     /**
-     * @var \dosamigos\google\maps\overlays\MarkerOptions the options for the marker
+     * @var string the map name (for JS)
      */
-    public $options = [];
+    public $map;
 
     /**
      * @param array $config
@@ -51,11 +57,18 @@ class Marker extends ObjectAbstract
      */
     public function __construct($config = [])
     {
-        // Обработка 'title' для совместимости с существующим кодом сайта
+        // Обработка 'title' для совместимости
         if (isset($config['title'])) {
             $this->title = $config['title'];
-            $this->options['title'] = $this->title;  // Копируем в options для JS
+            $this->options['title'] = $this->title;
             unset($config['title']);
+        }
+
+        // Обработка 'icon' для совместимости
+        if (isset($config['icon'])) {
+            $this->icon = $config['icon'];
+            $this->options['icon'] = $this->icon;  // Копируем в options для JS (URL иконки)
+            unset($config['icon']);
         }
 
         parent::__construct($config);
@@ -81,12 +94,12 @@ class Marker extends ObjectAbstract
     public function setPosition(LatLng $value)
     {
         $this->position = $value;
-        $this->options['position'] = $value;
+        $this->options['position'] = $value->getJs();  // Для JS
     }
 
     /**
      * Attaches an info window to the marker
-     * @param \dosamigos\google\maps\overlays\InfoWindow $infoWindow
+     * @param InfoWindow $infoWindow
      * @return void
      */
     public function attachInfoWindow(InfoWindow $infoWindow)
@@ -106,13 +119,13 @@ class Marker extends ObjectAbstract
 
     /**
      * Returns the JavaScript code for the marker
-     * @param string $map
+     * @param string|null $map
      * @return string
      */
     public function getJs($map = null)
     {
         $options = $this->options;
-        $options['map'] = (is_null($map)) ? 'no map' : $map;
+        $options['map'] = $map ?? $this->map;  // Используем переданный $map или свойство $map
         $js = "var {$this->name} = new google.maps.Marker({$this->encode()});";
 
         if ($this->infoWindow !== null) {
@@ -124,6 +137,7 @@ class Marker extends ObjectAbstract
                 $js .= $event->getJs($this->name);
             }
         }
+
         return $js;
     }
 }
