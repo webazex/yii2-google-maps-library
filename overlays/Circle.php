@@ -12,6 +12,7 @@ namespace dosamigos\google\maps\overlays;
 
 use dosamigos\google\maps\OverlayTrait;
 use yii\base\InvalidConfigException;
+use dosamigos\google\maps\LatLng;
 
 /**
  * Circle
