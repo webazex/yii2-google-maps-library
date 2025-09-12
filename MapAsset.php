@@ -14,11 +14,11 @@ use yii\web\AssetBundle;
 /**
  * MapAsset
  *
- * Registers the Google Maps Javascript API
+ * Registers the Google Maps Javascript API asynchronously with callback
  *
  * @author Antonio Ramirez <hola@2amigos.us>
  * @author Latul Anton <webazex@gmail.com>
- * @link http://www.2amigos.us/
+ * @link http://2amigos.us/
  * @link https://latul.website/
  * @package dosamigos\google\maps
  */
@@ -40,15 +40,25 @@ class MapAsset extends AssetBundle
     public function init()
     {
         parent::init();
-        $key = isset($this->options['key']) ? $this->options['key'] : '';
+
+        // Получаем опции из assetManager (key, language, version) или Yii::$app->params
+        $options = array_merge($this->options, Yii::$app->params['googleMapsOptions'] ?? []);
+        $key = $options['key'] ?? '';
+        $language = $options['language'] ?? (Yii::$app->params['googleMapsLanguage'] ?? '');
+        $libraries = $options['libraries'] ?? (Yii::$app->params['googleMapsLibraries'] ?? []);
+        $version = $options['version'] ?? '3.exp';  // Рекомендуемая версия Google
+
+        // Формируем query-параметры
+        $query = http_build_query([
+            'key' => $key,
+            'language' => $language,
+            'libraries' => is_array($libraries) ? implode(',', $libraries) : $libraries,
+            'v' => $version,
+        ]);
+
+        // Асинхронная загрузка с callback
         $this->js = [
-            'https://maps.googleapis.com/maps/api/js?key=' . $key
+            "https://maps.googleapis.com/maps/api/js?{$query}&callback=initMapWBZX&loading=async"
         ];
-        if (isset(Yii::$app->params['googleMapsLanguage'])) {
-            $this->js[0] .= '&language=' . Yii::$app->params['googleMapsLanguage'];
-        }
-        if (isset(Yii::$app->params['googleMapsLibraries'])) {
-            $this->js[0] .= '&libraries=' . implode(',', Yii::$app->params['googleMapsLibraries']);
-        }
     }
 }
