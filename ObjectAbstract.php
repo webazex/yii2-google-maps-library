@@ -48,7 +48,7 @@ abstract class ObjectAbstract extends Component
         parent::init();
         // Автоматическая генерация name, если не задано
         if ($this->name === null) {
-            $this->name = strtolower(get_class($this)) . uniqid();  // Например, 'marker64f1a2b3c4d5e'
+            $this->name = basename(str_replace('\\', '/', get_class($this)));  // Например, 'marker64f1a2b3c4d5e'
         }
     }
 
