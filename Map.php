@@ -105,11 +105,11 @@ class Map extends Component
         // Обработка 'width' и 'height' для совместимости
         $style = '';
         if (isset($config['width'])) {
-            $style .= 'width: ' . $config['width'] . '; ';
+            $style .= 'width: ' . $config['width'] . 'px; ';
             unset($config['width']);
         }
         if (isset($config['height'])) {
-            $style .= 'height: ' . $config['height'] . '; ';
+            $style .= 'height: ' . $config['height'] . 'px; ';
             unset($config['height']);
         }
         if (!empty($style)) {
@@ -154,7 +154,7 @@ class Map extends Component
      */
     public function getJs()
     {
-        $center = new LatLng(['lat' => $this->centerLat, 'lng' => $this->centerLng]);
+        //$center = new LatLng(['lat' => $this->centerLat, 'lng' => $this->centerLng]);
         $options = $this->getOptions();
         $js = "var {$this->name} = new google.maps.Map(document.getElementById('{$this->containerId}'), {$options});";
 
