@@ -1,93 +1,140 @@
 <?php
-
 /*
- *
  * @copyright Copyright (c) 2013-2019 2amigos
+ * @copyright Copyright (c) 2025 Latul Anton (webazex@gmail.com, https://latul.website)
  * @link http://2amigos.us
  * @license http://www.opensource.org/licenses/bsd-license.php New BSD License
- *
  */
 
 namespace dosamigos\google\maps\overlays;
 
-use dosamigos\google\maps\OverlayTrait;
-use yii\base\InvalidConfigException;
+use dosamigos\google\maps\ObjectAbstract;
 use dosamigos\google\maps\LatLng;
+use dosamigos\google\maps\Event;
+use yii\base\InvalidConfigException;
 
 /**
  * Circle
  *
- * Object to render circles on the map.
+ * A circle on the Earth's surface (spherical cap).
  *
  * @author Antonio Ramirez <hola@2amigos.us>
- *
+ * @author Latul Anton <webazex@gmail.com>
  * @link http://www.2amigos.us/
+ * @link https://latul.website/
  * @package dosamigos\google\maps
  */
-class Circle extends CircleOptions
+class Circle extends ObjectAbstract
 {
-    use OverlayTrait;
+    /**
+     * @var \dosamigos\google\maps\LatLng the center of the circle
+     */
+    public $center;
 
     /**
-     * @inheritdoc
+     * @var float the radius in meters
+     */
+    public $radius;
+
+    /**
+     * @param array $config
      * @throws \yii\base\InvalidConfigException
      */
+    public function __construct($config = [])
+    {
+        $this->options = array_merge([
+            'center' => null,
+            'radius' => null,
+            'strokeColor' => null,
+            'strokeOpacity' => null,
+            'strokeWeight' => null,
+            'fillColor' => null,
+            'fillOpacity' => null,
+            'clickable' => null,
+            'draggable' => null,
+            'editable' => null,
+            'visible' => null,
+            'zIndex' => null,
+        ], $this->options);
 
-    private $_center;
-    private $_radius;
+        parent::__construct($config);
+
+        // Обработка 'center' для совместимости
+        if (isset($config['center']) && $config['center'] instanceof LatLng) {
+            $this->center = $config['center'];
+            $this->options['center'] = $this->center->getJs();
+        }
+        // Обработка 'radius'
+        if (isset($config['radius'])) {
+            $this->radius = (float)$config['radius'];
+            $this->options['radius'] = $this->radius;
+        }
+    }
+
+    /**
+     * @throws \yii\base\InvalidConfigException
+     * @return void
+     */
     public function init()
     {
-        if ($this->center == null) {
+        parent::init();
+        if ($this->center === null) {
             throw new InvalidConfigException('"center" cannot be null');
         }
-    }
-
-    public function setCenter(LatLng $center)
-    {
-        $this->_center = $center;
-        $this->options['center'] = $center;
-    }
-
-    public function getCenter()
-    {
-        return $this->_center;
-    }
-
-    public function setRadius($radius)
-    {
-        $this->_radius = $radius;
-        $this->options['radius'] = $radius;
-    }
-
-    public function getRadius()
-    {
-        return $this->_radius;
+        if ($this->radius === null) {
+            throw new InvalidConfigException('"radius" cannot be null');
+        }
     }
 
     /**
-     * Returns the center of bounds
-     * @return \dosamigos\google\maps\LatLng
+     * Sets the center of the circle
+     * @param \dosamigos\google\maps\LatLng $value
+     * @return void
      */
-    public function getCenterOfBounds()
+    public function setCenter(LatLng $value)
     {
-        return $this->center;
+        $this->center = $value;
+        $this->options['center'] = $value->getJs();
     }
 
     /**
-     * Returns the js code to create a rectangle on a map
+     * Sets the radius of the circle
+     * @param float $value
+     * @return void
+     */
+    public function setRadius($value)
+    {
+        $this->radius = (float)$value;
+        $this->options['radius'] = $this->radius;
+    }
+
+    /**
+     * Adds an event to the circle
+     * @param \dosamigos\google\maps\Event $event
+     * @return void
+     */
+    public function addEvent(Event $event)
+    {
+        $this->events[] = $event;
+    }
+
+    /**
+     * Returns the JavaScript code for the circle
+     * @param string|null $map
      * @return string
      */
-    public function getJs()
+    public function getJs($map = null)
     {
-        $js = $this->getInfoWindowJs();
-
-        $js[] = "var {$this->getName()} = new google.maps.Circle({$this->getEncodedOptions()});";
+        $options = $this->options;
+        $options['map'] = $map ?? $this->map;
+        $js = "var {$this->name} = new google.maps.Circle({$this->encode()});";
 
         foreach ($this->events as $event) {
-            /** @var \dosamigos\google\maps\Event $event */
-            $js[] = $event->getJs($this->getName());
+            if ($event instanceof Event) {
+                $js .= $event->getJs($this->name);
+            }
         }
 
-        return implode("\n", $js);
+        return $js;
     }
 }
