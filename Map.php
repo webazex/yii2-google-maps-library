@@ -13,7 +13,6 @@ use dosamigos\google\maps\ObjectAbstract;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\web\View;
-use Yii;
 
 /**
  * Map
@@ -22,7 +21,7 @@ use Yii;
  *
  * @author Antonio Ramirez <hola@2amigos.us>
  * @author Latul Anton <webazex@gmail.com>
- * @link http://2amigos.us/
+ * @link http://www.2amigos.us/
  * @link https://latul.website/
  * @package dosamigos\google\maps
  */
@@ -120,17 +119,6 @@ class Map extends Component
     }
 
     /**
-     * @param $overlay
-     *
-     * @return $this
-     */
-    public function addOverlay($overlay)
-    {
-        $this->_overlays[] = $overlay;
-        return $this;
-    }
-
-    /**
      * @throws \yii\base\InvalidConfigException
      * @return void
      */
@@ -177,7 +165,7 @@ class Map extends Component
 
         foreach ($this->overlays as $overlay) {
             if ($overlay instanceof ObjectAbstract) {
-                $js .= $overlay->getJs($this->containerId);
+                $js .= $overlay->getJs($this->name);  // Передаём $this->name как $map
             }
         }
 
@@ -224,6 +212,16 @@ class Map extends Component
     }
 
     /**
+     * Adds an overlay to the map
+     * @param ObjectAbstract $overlay
+     * @return void
+     */
+    public function addOverlay(ObjectAbstract $overlay)
+    {
+        $this->overlays[] = $overlay;
+    }
+
+    /**
      * Appends a script to the map
      * @param string $js
      * @return void
@@ -242,7 +240,7 @@ class Map extends Component
         $html = '<div id="' . $this->containerId . '"' . $this->getContainerAttributes() . '></div>';
         // Оборачиваем JS в callback-функцию, чтобы ждать загрузки API
         $html .= '<script type="text/javascript">';
-        $html .= 'function initMapWBZX() { ';
+        $html .= 'function initMapGrok() { ';
         $html .= $this->getJs();
         $html .= ' }';
         $html .= '</script>';
