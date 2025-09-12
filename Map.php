@@ -21,7 +21,7 @@ use yii\web\View;
  *
  * @author Antonio Ramirez <hola@2amigos.us>
  * @author Latul Anton <webazex@gmail.com>
- * @link http://www.2amigos.us/
+ * @link http://2amigos.us/
  * @link https://latul.website/
  * @package dosamigos\google\maps
  */
@@ -35,7 +35,7 @@ class Map extends Component
     /**
      * @var string the HTML id attribute of the div where the map will be rendered
      */
-    public $containerId = 'map-container';  // По умолчанию 'map'
+    public $containerId = 'map';  // По умолчанию 'map'
 
     /**
      * @var float the initial center latitude
@@ -83,6 +83,11 @@ class Map extends Component
     public $js = [];
 
     /**
+     * @var bool whether to auto-register MapAsset (default true)
+     */
+    public $autoRegisterAsset = true;
+
+    /**
      * @param array $config
      * @throws \yii\base\InvalidConfigException
      */
@@ -126,6 +131,10 @@ class Map extends Component
         // Генерируем $name, если не задано
         if ($this->name === null) {
             $this->name = 'map' . uniqid();  // Уникальное имя, например 'map64f1a2b3c4d5e'
+        }
+        // Автоматическая регистрация MapAsset, если View доступен
+        if ($this->autoRegisterAsset && Yii::$app->has('view', true)) {
+            MapAsset::register(Yii::$app->view);
         }
     }
 
@@ -219,11 +228,16 @@ class Map extends Component
     public function display()
     {
         $html = '<div id="' . $this->containerId . '"' . $this->getContainerAttributes() . '></div>';
-        $html .= '<script>' . $this->getJs() . '</script>';
+        // Оборачиваем JS в callback-функцию, чтобы ждать загрузки API
+        $html .= '<script type="text/javascript">';
+        $html .= 'function initMapWBZX() { ';
+        $html .= $this->getJs();
+        $html .= ' }';
+        $html .= '</script>';
 
         // Добавляем дополнительные скрипты из appendScript
         foreach ($this->js as $script) {
-            $html .= '<script>' . $script . '</script>';
+            $html .= '<script type="text/javascript">' . $script . '</script>';
         }
 
         return $html;
@@ -237,7 +251,7 @@ class Map extends Component
     {
         $attributes = [];
         foreach ($this->containerOptions as $key => $value) {
-            $attributes[] = $key . '="' . $value . '"';
+            $attributes[] = $key . '="' . htmlspecialchars($value, ENT_QUOTES) . '"';
         }
         return implode(' ', $attributes);
     }
