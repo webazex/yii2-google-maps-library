@@ -173,6 +173,15 @@ class Map extends Component
     }
 
     /**
+     * @return array
+     */
+    public function getOverlays()
+    {
+        return $this->_overlays;
+    }
+
+
+    /**
      * Returns the map options as JSON
      * @return string
      */
