@@ -25,7 +25,7 @@ use yii\base\InvalidConfigException;
 abstract class ObjectAbstract extends Component
 {
     /**
-     * @var string the name of the object (used for JavaScript variable)
+     * @var string the name of the object
      */
     public $name;
 
@@ -46,8 +46,9 @@ abstract class ObjectAbstract extends Component
     public function init()
     {
         parent::init();
+        // Автоматическая генерация name, если не задано
         if ($this->name === null) {
-            throw new InvalidConfigException('"name" cannot be null');
+            $this->name = strtolower(get_class($this)) . uniqid();  // Например, 'marker64f1a2b3c4d5e'
         }
     }
 
@@ -85,10 +86,7 @@ abstract class ObjectAbstract extends Component
      * Returns the JavaScript code for the object
      * @return string
      */
-    public function getJs()
-    {
-        return '';
-    }
+    abstract public function getJs();
 
     /**
      * Encodes the options as JSON
