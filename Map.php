@@ -13,6 +13,7 @@ use dosamigos\google\maps\ObjectAbstract;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\web\View;
+use Yii;
 
 /**
  * Map
