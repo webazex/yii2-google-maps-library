@@ -120,6 +120,17 @@ class Map extends Component
     }
 
     /**
+     * @param $overlay
+     *
+     * @return $this
+     */
+    public function addOverlay($overlay)
+    {
+        $this->_overlays[] = $overlay;
+        return $this;
+    }
+
+    /**
      * @throws \yii\base\InvalidConfigException
      * @return void
      */
