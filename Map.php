@@ -250,7 +250,7 @@ class Map extends Component
         $html = '<div id="' . $this->containerId . '"' . $this->getContainerAttributes() . '></div>';
         // Оборачиваем JS в callback-функцию, чтобы ждать загрузки API
         $html .= '<script type="text/javascript">';
-        $html .= 'function initMapGrok() { ';
+        $html .= 'function initMapWBZX() { ';
         $html .= $this->getJs();
         $html .= ' }';
         $html .= '</script>';
