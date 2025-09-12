@@ -76,7 +76,7 @@ class Map extends Component
     /**
      * @var array<\dosamigos\google\maps\ObjectAbstract> the overlays to attach to the map
      */
-    public $overlays = [];
+    private $_overlays = [];
 
     /**
      * @var array<string> the additional JavaScript code to append to the map
@@ -164,21 +164,13 @@ class Map extends Component
             }
         }
 
-        foreach ($this->overlays as $overlay) {
+        foreach ($this->_overlays as $overlay) {
             if ($overlay instanceof ObjectAbstract) {
                 $js .= $overlay->getJs($this->name);  // Передаём $this->name как $map
             }
         }
 
         return $js;
-    }
-
-    /**
-     * @return array
-     */
-    public function getOverlays()
-    {
-        return $this->overlays;
     }
 
     /**
@@ -227,7 +219,16 @@ class Map extends Component
      */
     public function addOverlay(ObjectAbstract $overlay)
     {
-        $this->overlays[] = $overlay;
+        $this->_overlays[] = $overlay;
+    }
+
+    /**
+     * Returns the overlays attached to the map
+     * @return array<\dosamigos\google\maps\ObjectAbstract>
+     */
+    public function getOverlays()
+    {
+        return $this->_overlays;
     }
 
     /**
