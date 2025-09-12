@@ -34,6 +34,13 @@ class Circle extends CircleOptions
      */
 
     private $_center;
+    private $_radius;
+    public function init()
+    {
+        if ($this->center == null) {
+            throw new InvalidConfigException('"center" cannot be null');
+        }
+    }
 
     public function setCenter(LatLng $center)
     {
@@ -45,11 +52,16 @@ class Circle extends CircleOptions
     {
         return $this->_center;
     }
-    public function init()
+
+    public function setRadius($radius)
     {
-        if ($this->center == null) {
-            throw new InvalidConfigException('"center" cannot be null');
-        }
+        $this->_radius = $radius;
+        $this->options['radius'] = $radius;
+    }
+
+    public function getRadius()
+    {
+        return $this->_radius;
     }
 
     /**
