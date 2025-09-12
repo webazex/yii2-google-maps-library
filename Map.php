@@ -14,6 +14,7 @@ use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\web\View;
 use Yii;
+
 /**
  * Map
  *
@@ -177,9 +178,8 @@ class Map extends Component
      */
     public function getOverlays()
     {
-        return $this->_overlays;
+        return $this->overlays;
     }
-
 
     /**
      * Returns the map options as JSON
